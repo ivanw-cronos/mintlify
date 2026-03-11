@@ -8,6 +8,10 @@
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
+  "openapi": [
+    "https://explorer-api-doc.cronos.org/testnet/cronos-api-v2.yaml",
+    "https://explorer-api-doc.zkevm.cronos.org/testnet/cronos-api.yaml"
+  ],
   "navigation": {
     "tabs": [
       {
@@ -64,6 +68,24 @@
               "api-reference/endpoint/delete",
               "api-reference/endpoint/webhook"
             ]
+          }
+        ]
+      },
+      {
+        "tab": "Cronos Testnet API",
+        "groups": [
+          {
+            "group": "Cronos Testnet API v2",
+            "openapi": "https://explorer-api-doc.cronos.org/testnet/cronos-api-v2.yaml"
+          }
+        ]
+      },
+      {
+        "tab": "Cronos zkEVM API",
+        "groups": [
+          {
+            "group": "Cronos zkEVM API",
+            "openapi": "https://explorer-api-doc.zkevm.cronos.org/testnet/cronos-api.yaml"
           }
         ]
       }
