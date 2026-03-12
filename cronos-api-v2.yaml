@@ -1,0 +1,3894 @@
+openapi: 3.1.0
+info:
+  title: Cronos API - Testnet
+  description: |
+    Welcome to the Cronos API documentation.
+    
+    As a means to provide equitable access to blockchain data, we've developed the Cronos Developer APIs to empower developers with direct access to Cronos's blockchain data and services via GET/POST requests.
+    # Creating Account and Getting API Key
+    ## 1. Register an Account
+    Head over to the <a href="https://explorer.cronos.org/testnet/register"><strong>Account Registration</strong></a> page and provide email and password for your account.
+    
+    <img src="https://explorer-api.cronos.org/asset/cronos-api-registration.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 80%;"/>
+    
+    ## 2. Verify Your Email
+    A verification code will be sent to your email address to verify your sign up request. Fill in on the verification page for completing your registration
+    
+    <img src="https://explorer-api.cronos.org/asset/cronos-api-verification.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 3. Exploring Your Account
+    Upon signing in, you will have access to your account dashboard where you can make full use of Cronos explorer's features such as viewing API keys and viewing submitted contract verification status.
+
+    <img src="https://explorer-api.cronos.org/asset/cronos-api-member-dashboard.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 4. Getting an Default API Key
+    From your Account Dashboard, click on label <strong>My API Keys</strong>.
+    From there, you may view your API Keys. By Default, each Cronos Explorer account will assign a default API Key on registration completed.
+
+    <img src="https://explorer-api.cronos.org/asset/cronos-api-key-list.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 5. Using APIs
+    Once got your API Key, you could fetch data from provided endpoints.
+    
+    Example:
+    ```
+      curl --request GET 'https://explorer-api.cronos.org/testnet/api/v1/{module}/{action}?apikey={your_apikey}
+    ```
+  version: 2.0.1
+
+tags:
+  - name: Accounts
+    description: Account module v2 endpoints
+  - name: Contracts
+    description: Contract module v2 endpoints
+  - name: Transactions
+    description: Transaction module v2 endpoints
+  - name: Blocks
+    description: Block module v2 endpoints
+  - name: Logs
+    description: Event Log module v2 endpoints
+  - name: Eth Proxy
+    description: Eth Proxy module v2 endpoints
+  - name: Tokens
+    description: Token module v2 endpoints
+  - name: Stats
+    description: Stat module v2 endpoints
+
+
+paths:
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=balance:
+    get:
+      tags:
+        - Accounts
+      summary: Get CRO Balance for a Single Address
+      description: Returns the balance of a single address
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=balance&address={address}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [balance]
+        - name: address
+          in: query
+          description: Account address
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Block number or 'latest'
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: '1000000000000000000'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  # Additional Account v2 paths
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=balancemulti:
+    get:
+      tags:
+        - Accounts
+      summary: Get CRO Balance for Multiple Addresses
+      description: Returns the balance of multiple addresses in a single call
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=balancemulti&address={address}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [balancemulti]
+        - name: address
+          in: query
+          description: Comma-separated list of addresses
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Block number or 'latest'
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        account:
+                          type: string
+                          example: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
+                        balance:
+                          type: string
+                          example: '1000000000000000000'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=tokenbalance:
+      get:
+        tags:
+          - Tokens
+        summary: Get CRC-20 Token Account Balance by ContractAddress
+        description: Returns the balance of a CRC-20 token for a single address
+        x-codeSamples:
+          - lang: cURL
+            label: 'CLI'
+            source: |
+              curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=tokenbalance&contractaddress={contractaddress}&address={address}&tag={tag}&apikey={apikey}'
+        parameters:
+          - name: module
+            in: query
+            description: Module name
+            required: true
+            schema:
+              type: string
+              enum: [account]
+          - name: action
+            in: query
+            description: Action name
+            required: true
+            schema:
+              type: string
+              enum: [tokenbalance]
+          - name: contractaddress
+            in: query
+            description: Contract address
+            required: true
+            schema:
+              type: string
+          - name: address
+            in: query
+            description: Account address
+            required: true
+            schema:
+              type: string
+          - name: tag
+            in: query
+            description: Block number or 'latest'
+            required: true
+            schema:
+              type: string
+          - name: apikey
+            in: query
+            description: API Key
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: '1'
+                    message:
+                      type: string
+                      example: 'OK'
+                    result:
+                      type: string
+                      example: '4425499936563632395075'
+          '401':
+            description: unauthorized
+            content:
+              text/html:
+                schema:
+                  $ref: '#/components/schemas/ErrorUnauthenticated'
+          '400':
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=stats&action=tokensupply:
+    get:
+      tags:
+        - Tokens
+      summary: Get Token Supply by Contract Address
+      description: Returns the total supply of a token
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=stats&action=tokensupply&contractaddress={contractaddress}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [stats]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [tokensupply]
+        - name: contractaddress
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: '4793800900917733117906478'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+      
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlist:
+    get:
+      tags:
+        - Accounts
+      summary: Get Normal Transactions by Address
+      description: |
+        Returns a list of normal transactions by address.
+        
+        **Important Limitations:**
+        - Maximum 10,000 total records can be returned per request per block range
+        - Maximum offset is 1000 records per page
+        
+        **Pagination Strategy:**
+        If you need to retrieve more than 10,000 transactions, use a narrower block range and implement pagination by:
+        1. Using smaller block ranges (e.g., 1000-5000 blocks at a time)
+        2. Incrementing the startblock and endblock parameters to loop through all blocks
+        3. Keeping offset ≤ 1000 and using page parameter for pagination within each block range
+        
+        Example pagination workflow:
+        - First request: startblock=1000000, endblock=1005000, page=1, offset=100
+        - If 10k records returned, make next request: startblock=1000000, endblock=1004000, page=1, offset=100
+        - Continue until fewer than 10k records are returned
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlist&address={address}&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [txlist]
+        - name: address
+          in: query
+          description: Account address
+          required: true
+          schema:
+            type: string
+        - name: startblock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: endblock
+          in: query
+          description: Ending block number. Use smaller ranges if you need to retrieve more than 10k total transactions.
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Number of records per page (maximum 1000)
+          required: true
+          schema:
+            type: integer
+            maximum: 1000
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '21929'
+                        timeStamp:
+                          type: string
+                          example: '1636454661'
+                        hash:
+                          type: string
+                          example: '0x2c30c044e9084c3ef49308bb89379a2570ea3ec2e7396794aacd9185bee2547a'
+                        nonce:
+                          type: string
+                          example: '23'
+                        blockHash:
+                          type: string
+                          example: '0x21972f1cfc00f77c6bba87512ae179252a39465931633f5c4b0b35c4ffa34aa3'
+                        transactionIndex:
+                          type: string
+                          example: '14'
+                        from:
+                          type: string
+                          example: '0x718d61377524348eb05293c78fbd8a62b14924b0'
+                        to:
+                          type: string
+                          example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                        value:
+                          type: string
+                          example: '0'
+                        gas:
+                          type: string
+                          example: '44354'
+                        gasPrice:
+                          type: string
+                          example: '5000000000000'
+                        isError:
+                          type: string
+                          example: '0'
+                        txreceipt_status:
+                          type: string
+                          example: '1'
+                        input:
+                          type: string
+                          example: '0x095ea7b3000000000000000000000000dccd6455ae04b03d785f12196b492b18129564bcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+                        contractAddress:
+                          type: string
+                          example: ''
+                        cumulativeGasUsed:
+                          type: string
+                          example: '1988603'
+                        gasUsed:
+                          type: string
+                          example: '44354'
+                        confirmations:
+                          type: string
+                          example: '19700840'
+                        methodId:
+                          type: string
+                          example: '0x095ea7b3'
+                        functionName:
+                          type: string
+                          example: 'approve(address spender, uint256 amount)'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlistinternal:
+    get:
+      tags:
+        - Accounts
+      summary: Get Internal Transactions by Address
+      description: Returns the list of internal transactions performed by an address and block range, with optional pagination.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlistinternal&address={address}&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [txlistinternal]
+        - name: address
+          in: query
+          description: Account address
+          required: true
+          schema:
+            type: string
+        - name: startblock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: endblock
+          in: query
+          description: Ending block number, block range between startblock and endblock should be less than 10000
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Number of records per page
+          required: true
+          schema:
+            type: integer
+
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '8731992'
+                        timeStamp:
+                          type: string
+                          example: '1686394863'
+                        hash:
+                          type: string
+                          example: '0xa30a72b64e3f761cd3897b6ddce45e16664616f51487a46b96056a09e888dde6'
+                        from:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        to:
+                          type: string
+                          example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                        value:
+                          type: string
+                          example: '0'
+                        contractAddress:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        input:
+                          type: string
+                          example: '0x38ed1739000000000000000000000000000000000000000000000003353d4d9968b1c000000000000000000000000000000000000000000000000000000000000039768100000000000000000000000000000000000000000000000000000000000000a00000000000000000000000002589a59de5c4181c6acdfac36fb1d50bc275961200000000000000000000000000000000000000000000000000000000c908b2360000000000000000000000000000000000000000000000000000000000000004000000000000000000000000cbf0adea24fd5f32c6e7f0474f0d1b94ace4e2e70000000000000000000000002d03bece6747adc00e1a131bba1469c15fd11e030000000000000000000000005c7f8a570d578ed84e63fdfa7b1ee72deae1ae230000000000000000000000009d5a7d02d51dc523197e62c2865907dbb53642af'
+                        type:
+                          type: string
+                          example: 'call'
+                        gas:
+                          type: string
+                          example: '178390'
+                        gasUsed:
+                          type: string
+                          example: '37364'
+                        traceId:
+                          type: string
+                          example: '5_0'
+                        isError:
+                          type: string
+                          example: '0'
+                        errCode:
+                          type: string
+                          example: ''
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlistinternal&txhash={txhash}:
+    get:
+      tags:
+        - Accounts
+      summary: Get Internal Transactions by Transaction Hash
+      description: Returns internal transactions by transaction hash
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlistinternal&txhash={txhash}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [txlistinternal]
+        - name: txhash
+          in: query
+          description: Transaction hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '8731992'
+                        timeStamp:
+                          type: string
+                          example: '1686394863'
+                        hash:
+                          type: string
+                          example: '0xa30a72b64e3f761cd3897b6ddce45e16664616f51487a46b96056a09e888dde6'
+                        from:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        to:
+                          type: string
+                          example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                        value:
+                          type: string
+                          example: '0'
+                        contractAddress:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        input:
+                          type: string
+                          example: '0x38ed1739000000000000000000000000000000000000000000000003353d4d9968b1c000000000000000000000000000000000000000000000000000000000000039768100000000000000000000000000000000000000000000000000000000000000a00000000000000000000000002589a59de5c4181c6acdfac36fb1d50bc275961200000000000000000000000000000000000000000000000000000000c908b2360000000000000000000000000000000000000000000000000000000000000004000000000000000000000000cbf0adea24fd5f32c6e7f0474f0d1b94ace4e2e70000000000000000000000002d03bece6747adc00e1a131bba1469c15fd11e030000000000000000000000005c7f8a570d578ed84e63fdfa7b1ee72deae1ae230000000000000000000000009d5a7d02d51dc523197e62c2865907dbb53642af'
+                        type:
+                          type: string
+                          example: 'call'
+                        gas:
+                          type: string
+                          example: '178390'
+                        gasUsed:
+                          type: string
+                          example: '37364'
+                        traceId:
+                          type: string
+                          example: '5_0'
+                        isError:
+                          type: string
+                          example: '0'
+                        errCode:
+                          type: string
+                          example: ''
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlistinternal&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}:
+    get:
+      tags:
+        - Accounts
+      summary: Get Internal Transactions by Block Range
+      description: Returns a list of internal transactions by block range
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=txlistinternal&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [txlistinternal]
+        - name: startblock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: endblock
+          in: query
+          description: Ending block number, block range between startblock and endblock should be less than 10000
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Number of records per page
+          required: true
+          schema:
+            type: integer
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '8731992'
+                        timeStamp:
+                          type: string
+                          example: '1686394863'
+                        hash:
+                          type: string
+                          example: '0xa30a72b64e3f761cd3897b6ddce45e16664616f51487a46b96056a09e888dde6'
+                        from:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        to:
+                          type: string
+                          example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                        value:
+                          type: string
+                          example: '0'
+                        contractAddress:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        input:
+                          type: string
+                          example: '0x38ed1739000000000000000000000000000000000000000000000003353d4d9968b1c000000000000000000000000000000000000000000000000000000000000039768100000000000000000000000000000000000000000000000000000000000000a00000000000000000000000002589a59de5c4181c6acdfac36fb1d50bc275961200000000000000000000000000000000000000000000000000000000c908b2360000000000000000000000000000000000000000000000000000000000000004000000000000000000000000cbf0adea24fd5f32c6e7f0474f0d1b94ace4e2e70000000000000000000000002d03bece6747adc00e1a131bba1469c15fd11e030000000000000000000000005c7f8a570d578ed84e63fdfa7b1ee72deae1ae230000000000000000000000009d5a7d02d51dc523197e62c2865907dbb53642af'
+                        type:
+                          type: string
+                          example: 'call'
+                        gas:
+                          type: string
+                          example: '178390'
+                        gasUsed:
+                          type: string
+                          example: '37364'
+                        traceId:
+                          type: string
+                          example: '5_0'
+                        isError:
+                          type: string
+                          example: '0'
+                        errCode:
+                          type: string
+                          example: ''
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=tokentx:
+    get:
+      tags:
+        - Accounts
+      summary: Get CRC-20 Token Transfer Events by Address
+      description: | 
+        Returns a list of CRC-20 token transfer events.
+                
+        **Important Limitations:**
+        - Maximum 10,000 total records can be returned per request per block range
+        - Maximum offset is 1000 records per page
+        
+        **Pagination Strategy:**
+        If you need to retrieve more than 10,000 transfer events, use a narrower block range and implement pagination by:
+        1. Using smaller block ranges (e.g., 1000-5000 blocks at a time)
+        2. Incrementing the startblock and endblock parameters to loop through all blocks
+        3. Keeping offset ≤ 1000 and using page parameter for pagination within each block range
+        
+        Example pagination workflow:
+        - First request: startblock=1000000, endblock=1005000, page=1, offset=100
+        - If 10k records returned, make next request: startblock=1000000, endblock=1004000, page=1, offset=100
+        - Continue until fewer than 10k records are returned
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=tokentx&address={address}&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [tokentx]
+        - name: address
+          in: query
+          description: Account address
+          required: true
+          schema:
+            type: string
+        - name: startblock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: endblock
+          in: query
+          description: Ending block number. Use smaller ranges if you need to retrieve more than 10k total transactions.
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Number of records per page (maximum 1000)
+          required: true
+          schema:
+            type: integer
+            maximum: 1000
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '8731992'
+                        timeStamp:
+                          type: string
+                          example: '1686394863'
+                        hash:
+                          type: string
+                          example: '0x741749e919ba4980247babe4408e36e55444609cd934bbd582f9e2bfa92000fc'
+                        nonce:
+                          type: string
+                          example: '18'
+                        blockHash:
+                          type: string
+                          example: '0xcd848d1ddb0e51da4cd094d47ac96d622b24ede636b1f28ced1c9437845cc9bd'
+                        contractAddress:
+                          type: string
+                          example: '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23'
+                        from:
+                          type: string
+                          example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                        to:
+                          type: string
+                          example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                        value:
+                          type: string
+                          example: '164951128687951264083'
+                        tokenName:
+                          type: string
+                          example: 'Wrapped CRO'
+                        tokenSymbol:
+                          type: string
+                          example: 'WCRO'
+                        tokenDecimal:
+                          type: string
+                          example: '18'
+                        transactionIndex:
+                          type: string
+                          example: '0'
+                        gas:
+                          type: string
+                          example: '165790'
+                        gasPrice:
+                          type: string
+                          example: '4730536502039'
+                        gasUsed:
+                          type: string
+                          example: '118622'
+                        cumulativeGasUsed:
+                          type: string
+                          example: '118622'
+                        input:
+                          type: string
+                          example: '0x18cbafe500000000000000000000000000000000000000000002b3e323c892ef48ff0000000000000000000000000000000000000000000000000008e5c49699a3c833f100000000000000000000000000000000000000000000000000000000000000a000000000000000000000000038d3f7f32c4194d7fa6878c33ec6e2fbbb5620d900000000000000000000000000000000000000000000000000000000c908b21c00000000000000000000000000000000000000000000000000000000000000020000000000000000000000002d03bece6747adc00e1a131bba1469c15fd11e030000000000000000000000005c7f8a570d578ed84e63fdfa7b1ee72deae1ae23'
+                        confirmations:
+                          type: string
+                          example: '10991008'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=block&action=getblockreward:
+    get:
+      tags:
+        - Blocks
+      summary: Get Block Rewards by Block Number
+      description: Returns the block reward awarded for validating a certain block.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=block&action=getblockreward&blockno={blockno}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [block]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getblockreward]
+        - name: blockno
+          in: query
+          description: Block number
+          required: true
+          schema:
+            type: integer
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      blockNumber:
+                        type: string
+                        example: '2170000'
+                      timeStamp:
+                        type: string
+                        example: '1648871296'
+                      blockMiner:
+                        type: string
+                        example: '0x5704F22668f1552B9306744a7461f0583073F003'
+                      blockReward:
+                        type: string
+                        example: '8722445675808281683'
+                      uncles:
+                        type: array
+                        items:
+                          type: object
+                        example: []
+                      uncleInclusionReward:
+                        type: string
+                        example: '0'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=block&action=getblockcountdown:
+    get:
+      tags:
+        - Blocks
+      summary: Get Estimated Block Countdown Time by Block Number
+      description: Returns the estimated time remaining, in seconds, until a certain block is validated.
+
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=block&action=getblockcountdown&blockno={blockno}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [block]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getblockcountdown]
+        - name: blockno
+          in: query
+          description: Block number
+          required: true
+          schema:
+            type: integer
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      CurrentBlock:
+                        type: string
+                        example: '19723752'
+                      CountdownBlock:
+                        type: string
+                        example: '19793051'
+                      RemainingBlock:
+                        type: string
+                        example: '69299'
+                      EstimateTimeInSec:
+                        type: string
+                        example: '346495'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+                
+  https://explorer-api.cronos.org/testnet/api/v2?module=block&action=getblocknobytime:
+    get:
+      tags:
+        - Blocks
+      summary: Get Block Number by Timestamp
+      description: Returns the block number that was validated at a certain timestamp.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=block&action=getblocknobytime&timestamp={timestamp}&closest={closest}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [block]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getblocknobytime]
+        - name: timestamp
+          in: query
+          description: Unix timestamp
+          required: true
+          schema:
+            type: integer
+        - name: closest
+          in: query
+          description: Closest block before or after the timestamp
+          required: true
+          schema:
+            type: string
+            enum: [before, after]
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: '19692057'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=getabi:
+    get:
+      tags:
+        - Contracts
+      summary: Get Contract ABI
+      description: Returns the contract Application Binary Interface ( ABI ) of a verified smart contract.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=getabi&address={address}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [contract]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getabi]
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: '[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"}]'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=getsourcecode:
+    get:
+      tags:
+        - Contracts
+      summary: Get Contract Source Code
+      description: Returns the Solidity source code of a verified smart contract.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=getsourcecode&address={address}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [contract]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getsourcecode]
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      SourceCode:
+                        type: string
+                        example: >-
+                          {\"sources\":{\"TestingContractVerification.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\ncontract TestingContractVerification {\\n    uint256 dummy123 = 123;\\n    uint256 public dummyInput; // use 1 as input for constructor\\n    address private owner;\\n\\n    constructor(uint256 _dummyInput) {\\n        owner = msg.sender;\\n        dummyInput = _dummyInput;\\n    }\\n\\n    modifier onlyOwner() {\\n        require(msg.sender == owner, \\\"only owner can call this function\\\");\\n        _;\\n    }\\n\\n    function selfDestruct() public onlyOwner {\\n        selfdestruct(payable(owner));\\n    }\\n}\\n\"}}}
+                      ABI:
+                        type: string
+                        example: >-
+                          [{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_dummyInput\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"dummyInput\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"selfDestruct\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]
+                      ContractName:
+                        type: string
+                        example: CronosToken
+                      CompilerVersion:
+                        type: string
+                        example: 0.8.19
+                      OptimizationUsed:
+                        type: string
+                        example: '0'
+                      Runs:
+                        type: string
+                        example: '200'
+                      ConstructorArguments:
+                        type: string
+                        example: >-
+                          0000000000000000000000000000000000000000000000000000000000000001
+                      EVMVersion:
+                        type: string
+                        example: 'paris'
+                      Library:
+                        type: string
+                        example: ''
+                      LicenseType:
+                        type: string
+                        example: 'MIT'
+                      Proxy:
+                        type: string
+                        example: '0'
+                      Implementation:
+                        type: string
+                        example: ''
+                      SwarmSource:
+                        type: string
+                        example: ''
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=checkverifystatus:
+    get:
+      tags:
+        - Contracts
+      summary: Get Contract Verification Status
+      description: Returns the contract verification status.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=checkverifystatus&guid={guid}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [contract]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getcontractcreation]
+        - name: guid
+          in: query
+          description: Verification GUID
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: 'Pass - Verified'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=getcontractcreation:
+    get:
+      tags:
+        - Contracts
+      summary: Get Contract Creation
+      description: Returns the contract creation data.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=contract&action=getcontractcreation&contractaddresses={contractaddresses}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [contract]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getcontractcreation]
+        - name: contractaddresses
+          in: query
+          description: Comma separated contract addresses, up to 5 allowed
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      contractAddress:
+                        type: string
+                        example: '0x145863eb42cf62847a6ca784e6416c1682b1b2ae'
+                      contractCreator:
+                        type: string
+                        example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                      txHash:
+                        type: string
+                        example: '0xa30a72b64e3f761cd3897b6ddce45e16664616f51487a46b96056a09e888dde6'
+                      blockNumber:
+                        type: string
+                        example: '8731992'
+                      timestamp:
+                        type: string
+                        example: '1686394863'
+                      contractFactory:
+                        type: string
+                        example: ''
+                      creationBytecode:
+                        type: string
+                        example: '0x608060405234801561001057600080fd5b5060405161010038038061010083398101604081905261002f9161004e565b600080546001600160a01b0319163317905561011e565b60008151905061005f816100d2565b92915050565b60006020828403121561007757600080fd5b600061008584828501610050565b91505092915050565b610097816100c2565b82525050565b60006020820190506100b2600083018461008e565b92915050565b6000819050919050565b6100ca816100b7565b81146100d557600080fd5b50565b6000813590506100e7816100c1565b92915050565b6000806040838503121561010457600080fd5b6000610112858286016100d8565b9250506020610123858286016100d8565b9150509250929050565b60006020820190508181036000830152610149816100f4565b9050919050565b60008115159050919050565b61016381610150565b811461016e57600080fd5b50565b6000813590506101808161015a565b929150
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2:
+    post:
+      tags:
+        - Contracts
+      summary: Submit Contract Verification
+      description: Submits a contract source code for verification.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+           curl --location 'https://explorer-api.cronos.org/testnet/api/v2?apikey={apikey}' \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'module=contract' \
+            --data-urlencode 'action=verifysourcecode' \
+            --data-urlencode 'contractname={contractname}' \
+            --data-urlencode 'contractaddress={contractaddress}' \
+            --data-urlencode 'compilerversion={compilerversion}' \
+            --data-urlencode 'constructorArguments={constructorArguments}' \
+            --data-urlencode 'codeformat=solidity-standard-json-input' \
+            --data-urlencode 'sourceCode={"language":"Solidity","sources":{"contracts/test.sol":{"content":"..."}},"settings":{"viaIR":true,"optimizer":{"enabled":true,"runs":1},"evmVersion":"paris","outputSelection":{"*":{"*":["evm.bytecode","evm.deployedBytecode","devdoc","userdoc","metadata","abi"]}}}}'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                module:
+                  type: string
+                  description: Module name
+                  required: true
+                action:
+                  type: string
+                  description: Action name
+                  required: true
+                contractname:
+                  type: string
+                  description: Name of Contract
+                  required: true
+                contractaddress:
+                  type: string
+                  description: Contract address
+                  required: true
+                compilerversion:
+                  type: string
+                  description: Compiler version for contract e.g. 0.8.23
+                  required: true
+                constructorArguments:
+                  type: string
+                  description: Constructor arguments of contract
+                  required: false
+                codeformat:
+                  type: string
+                  description: Format of the code submitted. Only `solidity-standard-json-input` is supported.
+                  required: true
+                  enum:
+                    - solidity-standard-json-input
+                sourceCode:
+                  type: string
+                  description: >-
+                    The standard JSON input used to compile the contract. See
+                    [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html#input-description)
+                    for details.
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: 'a1c52885-740d-4de5-9068-22001bde8307'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?apikey={apikey}:
+      post:
+        tags:
+          - Contracts
+        summary: Contract verification using Hardhat
+        status: 200
+        description: |
+          Submits a contract source code for verification using Hardhat.
+          
+          ## 1. Config the `hardhat.config.js` file
+          For this API version, user needs to specify the API key in `etherscan.apiKey` and `apiURL` temporarily. 
+
+          hardhat.config.js
+          ```
+          {
+              etherscan: {
+                apiKey: {
+                  cronosTestnet: "{YOUR_API_KEY}" // <-- replace with your api key
+                },
+                customChains: [
+                  {
+                    network: "cronosTestnet",
+                    chainId: 338,
+                    urls: {
+                      apiURL: "https://explorer-api.cronos.org/testnet/api/v2", // <-- replace the API service url
+                      browserURL: "https://explorer.cronos.org/testnet" // <-- replace the Cronos explorer url
+                    }
+                  }
+                ]
+              }
+          }
+          ```
+          ## 2. Contract deployment script
+          ```
+          npx hardhat run scripts/deploy.js --network cronosTestnet
+          ```
+
+          ## 3. Contract verification script
+          ```
+          npx hardhat verify --network cronosTestnet <contract_address>
+          ```      
+
+          For more detail about Hardhat, please visit https://hardhat.org/
+        requestBody:
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  module:
+                    type: string
+                    description: Module name
+                    required: true
+                  action:
+                    type: string
+                    description: Action name
+                    required: true
+                  contractname:
+                    type: string
+                    description: Name of Contract
+                    required: true
+                  contractaddress:
+                    type: string
+                    description: Contract address
+                    required: true
+                  compilerversion:
+                    type: string
+                    description: Compiler version for contract e.g. 0.8.23
+                    required: true
+                  constructorArguments:
+                    type: string
+                    description: Constructor arguments of contract
+                    required: false
+                  codeformat:
+                    type: string
+                    description: Format of the code submitted. Only `solidity-standard-json-input` is supported.
+                    required: true
+                    enum:
+                      - solidity-standard-json-input
+                  sourceCode:
+                    type: string
+                    description: >-
+                      The standard JSON input used to compile the contract. See
+                      [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html#input-description)
+                      for details.
+
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: '1'
+                    message:
+                      type: string
+                      example: 'OK'
+                    result:
+                      type: string
+                      example: 'a1c52885-740d-4de5-9068-22001bde8307'
+          '401':
+            description: unauthorized
+            content:
+              text/html:
+                schema:
+                  $ref: '#/components/schemas/ErrorUnauthenticated'
+          '400':
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=stats&action=ethsupply:
+    get:
+      tags:
+        - Stats
+      summary: Get Total Supply of CRO
+      description: Returns the current amount of CRO in circulation.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=stats&action=ethsupply&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [stats]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [ethsupply]
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: '1875865762595899579799999997'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=stats&action=ethprice:
+    get:
+      tags:
+        - Stats
+      summary: Get CRO Last Price
+      description: Returns the latest price of 1 CRO.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=stats&action=ethprice&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [stats]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [ethprice]
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      ethbtc:
+                        type: string
+                        example: '0.00000090139485473437'
+                      ethbtc_timestamp:
+                        type: string
+                        example: '1748330286'
+                      ethusd:
+                        type: string
+                        example: '0.098169110025'
+                      ethusd_timestamp:
+                        type: string
+                        example: '1748330286'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=tokennfttx:
+    get:
+      tags:
+        - Accounts
+      summary: Get CRC-721 Token Transfer Events by Address
+      description: | 
+        Returns the list of CRC-721 ( NFT ) tokens transferred by an address, with optional filtering by token contract.
+                
+        **Important Limitations:**
+        - Maximum 10,000 total records can be returned per request per block range
+        - Maximum offset is 1000 records per page
+        
+        **Pagination Strategy:**
+        If you need to retrieve more than 10,000 transfer events, use a narrower block range and implement pagination by:
+        1. Using smaller block ranges (e.g., 1000-5000 blocks at a time)
+        2. Incrementing the startblock and endblock parameters to loop through all blocks
+        3. Keeping offset ≤ 1000 and using page parameter for pagination within each block range
+        
+        Example pagination workflow:
+        - First request: startblock=1000000, endblock=1005000, page=1, offset=100
+        - If 10k records returned, make next request: startblock=1000000, endblock=1004000, page=1, offset=100
+        - Continue until fewer than 10k records are returned
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=tokennfttx&address={address}&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [tokennfttx]
+        - name: contractaddress
+          in: query
+          description: Token contract address
+          required: false
+          schema:
+            type: string
+        - name: address
+          in: query
+          description: Account address
+          required: true
+          schema:
+            type: string
+        - name: startblock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: endblock
+          in: query
+          description: Ending block number. Use smaller ranges if you need to retrieve more than 10k total transactions.
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Number of records per page (maximum 1000)
+          required: true
+          schema:
+            type: integer
+            maximum: 1000
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '19691501'
+                        timeStamp:
+                          type: string
+                          example: '1748325577'
+                        hash:
+                          type: string
+                          example: '0xc0f89a32a36c7516bc6521703ae60cfc1cdd68cd0e4963a9c082f30454f088ac'
+                        nonce:
+                          type: string
+                          example: '29275'
+                        blockHash:
+                          type: string
+                          example: '0x152de12115f150d6c33228749d0410e8c6627dc66ac04c025c7a5c3a604f45c5'
+                        from:
+                          type: string
+                          example: '0x815b7d3e83dc78edae840c7c2bb0f94c82596705'
+                        contractAddress:
+                          type: string
+                          example: '0xf884647dfa84696d9373f36ee413ccc48093f924'
+                        to:
+                          type: string
+                          example: '0xea2d9288c9d076cfcea3a4a58c587eac0a330284'
+                        tokenID:
+                          type: string
+                          example: '28348687178260117930262398571910434074653646157608764107397748697013363657116'
+                        tokenName:
+                          type: string
+                          example: 'Cronos ID Domain'
+                        tokenSymbol:
+                          type: string
+                          example: 'CROID'
+                        tokenDecimal:
+                          type: string
+                          example: '0'
+                        transactionIndex:
+                          type: string
+                          example: '3'
+                        gas:
+                          type: string
+                          example: '190059'
+                        gasPrice:
+                          type: string
+                          example: '3751500000000'
+                        gasUsed:
+                          type: string
+                          example: '187875'
+                        cumulativeGasUsed:
+                          type: string
+                          example: '2225322'
+                        input:
+                          type: string
+                          example: '0x3b6d032e000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000815b7d3e83dc78edae840c7c2bb0f94c825967050000000000000000000000000000000000000000000000022b1c8c1227a000003eacc9d07485694d9d5d6d0417d2d58549b4fddf9dbfbc5602fcaccee4e3c99c000000000000000000000000000000000000000000000000000000000000213400000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ea2d9288c9d076cfcea3a4a58c587eac0a330284000000000000000000000000f884647dfa84696d9373f36ee413ccc48093f9240000000000000000000000000000000000000000000000022b1c8c1227a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000009d421e5035cec61615422ef8fa60d03750e83e980000000000000000000000005c7f8a570d578ed84e63fdfa7b1ee72deae1ae230000000000000000000000000000000000000000000000000000000000000273000000000000000000000000000000000000000000000000000000006834598500000000000000000000000000000000000000000000000000000000692286bf00000000000000000000000000000000000000000000000000000000000021340000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001cb8b5c5b73ca055113570c43e73af8deb0c7847d77cd57b3bf865d493a60f84cf12940719adbd836043fee46ef6dd1b768e8bdfa680ace9ed0a815355376243110000000000000000000000000000000000000000000000000000000000000000'
+                        confirmations:
+                          type: string
+                          example: '31516'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=account&action=token1155tx:
+    get:
+      tags:
+        - Accounts
+      summary: Get CRC-1155 Token Transfer Events by Address
+      description: | 
+        Returns the list of CRC-1155 ( Multi Token Standard ) tokens transferred by an address, with optional filtering by token contract.
+                
+        **Important Limitations:**
+        - Maximum 10,000 total records can be returned per request per block range
+        - Maximum offset is 1000 records per page
+        
+        **Pagination Strategy:**
+        If you need to retrieve more than 10,000 transfer events, use a narrower block range and implement pagination by:
+        1. Using smaller block ranges (e.g., 1000-5000 blocks at a time)
+        2. Incrementing the startblock and endblock parameters to loop through all blocks
+        3. Keeping offset ≤ 1000 and using page parameter for pagination within each block range
+        
+        Example pagination workflow:
+        - First request: startblock=1000000, endblock=1005000, page=1, offset=100
+        - If 10k records returned, make next request: startblock=1000000, endblock=1004000, page=1, offset=100
+        - Continue until fewer than 10k records are returned
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=account&action=token1155tx&address={address}&startblock={startblock}&endblock={endblock}&page={page}&offset={offset}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [account]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [token1155tx]
+        - name: address
+          in: query
+          description: Account address
+          required: true
+          schema:
+            type: string
+        - name: contractaddress
+          in: query
+          description: Token contract address
+          required: false
+          schema:
+            type: string
+        - name: startblock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: endblock
+          in: query
+          description: Ending block number. Use smaller ranges if you need to retrieve more than 10k total transactions.
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: Number of records per page (maximum 1000)
+          required: true
+          schema:
+            type: integer
+            maximum: 1000
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: string
+                          example: '8809931'
+                        timeStamp:
+                          type: string
+                          example: '1686836172'
+                        hash:
+                          type: string
+                          example: '0xffc60d5d739be9554edbfbfb1085592895db7695e7762e0fdf07089792eac919'
+                        nonce:
+                          type: string
+                          example: '1562'
+                        blockHash:
+                          type: string
+                          example: '0xda22780f641ca52ae59d7cbcdbdd52a22c8a1412a7055cecefc5391b3885da79'
+                        transactionIndex:
+                          type: string
+                          example: '2'
+                        gas:
+                          type: string
+                          example: '120186'
+                        gasPrice:
+                          type: string
+                          example: '4999999954275'
+                        gasUsed:
+                          type: string
+                          example: '120186'
+                        cumulativeGasUsed:
+                          type: string
+                          example: '417307'
+                        input:
+                          type: string
+                          example: '0xb48ab8b6000000000000000000000000498156624229e62bec8955f80f24412b2a300a9c0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000'
+                        contractAddress:
+                          type: string
+                          example: '0xfa6888f9f3602e02507a2bbed661c8cb256949c8'
+                        from:
+                          type: string
+                          example: '0x0000000000000000000000000000000000000000'
+                        to:
+                          type: string
+                          example: '0x498156624229e62bec8955f80f24412b2a300a9c'
+                        tokenID:
+                          type: string
+                          example: '1'
+                        tokenValue:
+                          type: string
+                          example: '5'
+                        tokenName:
+                          type: string
+                          example: 'Atlantis Equipment'
+                        tokenSymbol:
+                          type: string
+                          example: 'EQUIPMENT'
+                        confirmations:
+                          type: string
+                          example: '10927954'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=transaction&action=getstatus:
+    get:
+      tags:
+        - Transactions
+      summary: Get Transaction Status
+      description: Returns the status code of a contract execution.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=transaction&action=getstatus&txhash={txhash}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [transaction]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getstatus]
+        - name: txhash
+          in: query
+          description: Transaction hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      isError:
+                        type: string
+                        example: '0'
+                      errDescription:
+                        type: string
+                        example: ''
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=transaction&action=gettxreceiptstatus:
+    get:
+      tags:
+        - Transactions
+      summary: Get Transaction Receipt Status
+      description: Returns the status code of a transaction execution.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=transaction&action=gettxreceiptstatus&txhash={txhash}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [transaction]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [gettxreceiptstatus]
+        - name: txhash
+          in: query
+          description: Transaction hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: '1'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=log&action=getLogs:
+    get:
+      tags:
+        - Logs
+      summary: Get Event Logs
+      description: Returns event Log by address, block range and topic inputs.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=log&action=getLogs&fromBlock={fromBlock}&toBlock={toBlock}&address={address}&topic0={topic0}&topic1={topic1}&topic2={topic2}&topic3={topic3}&topic0_1_opr={topic0_1_opr}&topic1_2_opr={topic1_2_opr}&topic2_3_opr={topic2_3_opr}&topic0_2_opr={topic0_2_opr}&topic0_3_opr={topic0_3_opr}&topic1_3_opr={topic1_3_opr}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [log]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [getLogs]
+        - name: fromBlock
+          in: query
+          description: Starting block number
+          required: true
+          schema:
+            type: integer
+        - name: toBlock
+          in: query
+          description: Ending block number, block range between startblock and endblock should be less than 10000
+          required: true
+          schema:
+            type: integer
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: topic0
+          in: query
+          description: Topic 0
+          required: false
+          schema:
+            type: string
+        - name: topic1
+          in: query
+          description: Topic 1
+          required: false
+          schema:
+            type: string
+        - name: topic2
+          in: query
+          description: Topic 2
+          required: false
+          schema:
+            type: string
+        - name: topic3
+          in: query
+          description: Topic 3
+          required: false
+          schema:
+            type: string
+        - name: topic0_1_opr
+          in: query
+          description: Operator between topic0 and topic1
+          required: false
+          schema:
+            type: string
+            enum: [and, or]
+        - name: topic1_2_opr
+          in: query
+          description: Operator between topic1 and topic2
+          required: false
+          schema:
+            type: string
+            enum: [and, or]
+        - name: topic2_3_opr
+          in: query
+          description: Operator between topic2 and topic3
+          required: false
+          schema:
+            type: string
+            enum: [and, or]
+        - name: topic0_2_opr
+          in: query
+          description: Operator between topic0 and topic2
+          required: false
+          schema:
+            type: string
+            enum: [and, or]
+        - name: topic0_3_opr
+          in: query
+          description: Operator between topic0 and topic3
+          required: false
+          schema:
+            type: string
+            enum: [and, or]
+        - name: topic1_3_opr
+          in: query
+          description: Operator between topic1 and topic3
+          required: false
+          schema:
+            type: string
+            enum: [and, or]
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                          example: '0x073a282bc85891627300106f8d7986899d9eeb40'
+                        topics:
+                          type: array
+                          items:
+                            type: string
+                          example: [
+                            '0x81cf85e873bf8ffc652276abd1df29c5cc0765b36ab5af38b47472b8fe55e119',
+                            '0x0000000000000000000000007dc04d7319154815f2bb92fef936dafbc6780ab3',
+                            '0x0000000000000000000000000000000000000000000000000000000000002e1e',
+                            '0x0000000000000000000000000000000000000000000000000000000000000002'
+                          ]
+                        data:
+                          type: string
+                          example: '0x000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000063bf212b431ec000000000000000000000000000000000000000000000000000000000000682da8360000000000000000000000000000000000000000000000000000000068343fb6'
+                        blockNumber:
+                          type: string
+                          example: '0x12b1bf1'
+                        blockHash:
+                          type: string
+                          example: '0x108258ca681dbcdb452fd71e6afaafefdc85978cff54ad79f18ca4976ecedb56'
+                        timeStamp:
+                          type: string
+                          example: '0x682da836'
+                        gasPrice:
+                          type: string
+                          example: '0x371d8979300'
+                        gasUsed:
+                          type: string
+                          example: '0xaf3ba'
+                        logIndex:
+                          type: string
+                          example: '0xd'
+                        transactionHash:
+                          type: string
+                          example: '0x58a0825147729eeb1ce5debf93e4764bc1b317ed7c0263d456266e633d886e4b'
+                        transactionIndex:
+                          type: string
+                          example: '0x3'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_blockNumber:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_blockNumber
+      description: Returns the number of most recent block
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_blockNumber&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_blockNumber]
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: '0x12d2269'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getBlockByNumber:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getBlockByNumber
+      description: Returns information about a block by block number
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getBlockByNumber&tag={tag}&boolean={boolean}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getBlockByNumber]
+        - name: tag
+          in: query
+          description: Block number in hex or 'latest'
+          required: true
+          schema:
+            type: string
+        - name: boolean
+          in: query
+          description: If true it returns the full transaction objects, if false only the hashes of the transactions
+          required: true
+          schema:
+            type: boolean
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: object
+                    properties:
+                      transactions:
+                        type: array
+                        items:
+                          type: string
+                        example: []
+                      hash:
+                        type: string
+                        example: '0x540b483b642b6da6d84f7edebd7c91a6259e42a53b8328c3fca2812694f6119d'
+                      receiptsRoot:
+                        type: string
+                        example: '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'
+                      sha3Uncles:
+                        type: string
+                        example: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'
+                      size:
+                        type: string
+                        example: '0x1007'
+                      difficulty:
+                        type: string
+                        example: '0x0'
+                      logsBloom:
+                        type: string
+                        example: '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+                      miner:
+                        type: string
+                        example: '0xca3e51c28da7dba174d034ce29779cf7fff2cab3'
+                      uncles:
+                        type: array
+                        items:
+                          type: string
+                        example: []
+                      totalDifficulty:
+                        type: string
+                        example: '0x0'
+                      extraData:
+                        type: string
+                        example: '0x'
+                      gasLimit:
+                        type: string
+                        example: '0x3938700'
+                      nonce:
+                        type: string
+                        example: '0x0000000000000000'
+                      parentHash:
+                        type: string
+                        example: '0xddb22cf7a800a1d1b7bd0a48e73470fa7651dd73083ae2f91a423d5e130ca1ed'
+                      stateRoot:
+                        type: string
+                        example: '0x73e287818a2ac6f51c97e19baba83b7b2c9802e858d57d08d914ae02202d24c7'
+                      timestamp:
+                        type: string
+                        example: '0x68391638'
+                      transactionsRoot:
+                        type: string
+                        example: '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'
+                      baseFeePerGas:
+                        type: string
+                        example: '0x3691d6afc00'
+                      gasUsed:
+                        type: string
+                        example: '0x0'
+                      mixHash:
+                        type: string
+                        example: '0x0000000000000000000000000000000000000000000000000000000000000000'
+                      number:
+                        type: string
+                        example: '0x12d226d'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getBlockTransactionCountByNumber:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getBlockTransactionCountByNumber
+      description: Returns the number of transactions in a block
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getBlockTransactionCountByNumber&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getBlockTransactionCountByNumber]
+        - name: tag
+          in: query
+          description: Block number in hex or tag
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0x1'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionByHash:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionByHash
+      description: Returns the information about a transaction requested by transaction hash
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionByHash&txhash={txhash}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getTransactionByHash]
+        - name: txhash
+          in: query
+          description: Transaction hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: object
+                    properties:
+                      value:
+                        type: string
+                        example: '0x0'
+                      r:
+                        type: string
+                        example: '0xcfaa181ecf81c8c6c60d68e90fae8424df52eb76e2ade090c2a1baa33d79778a'
+                      to:
+                        type: string
+                        example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                      transactionIndex:
+                        type: string
+                        example: '0xe'
+                      v:
+                        type: string
+                        example: '0x56'
+                      s:
+                        type: string
+                        example: '0x10a63fb892e82fa44a4d2cfbd9d517a0e8cf45ca47acda09bf4ec0b3fc37c4d2'
+                      from:
+                        type: string
+                        example: '0x718d61377524348eb05293c78fbd8a62b14924b0'
+                      nonce:
+                        type: string
+                        example: '0x17'
+                      type:
+                        type: string
+                        example: '0x0'
+                      hash:
+                        type: string
+                        example: '0x2c30c044e9084c3ef49308bb89379a2570ea3ec2e7396794aacd9185bee2547a'
+                      input:
+                        type: string
+                        example: '0x095ea7b3000000000000000000000000dccd6455ae04b03d785f12196b492b18129564bcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+                      gas:
+                        type: string
+                        example: '0xad42'
+                      gasPrice:
+                        type: string
+                        example: '0x48c27395000'
+                      chainId:
+                        type: string
+                        example: '0x19'
+                      blockHash:
+                        type: string
+                        example: '0x21972f1cfc00f77c6bba87512ae179252a39465931633f5c4b0b35c4ffa34aa3'
+                      blockNumber:
+                        type: string
+                        example: '0x55a9'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionByBlockNumberAndIndex:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionByBlockNumberAndIndex
+      description: Returns information about a transaction by block number and transaction index position
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionByBlockNumberAndIndex&tag={tag}&index={index}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getTransactionByBlockNumberAndIndex]
+        - name: tag
+          in: query
+          description: Block number in hex or tag
+          required: true
+          schema:
+            type: string
+        - name: index
+          in: query
+          description: Transaction index position
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: object
+                    properties:
+                      nonce:
+                        type: string
+                        example: '0xf3'
+                      transactionIndex:
+                        type: string
+                        example: '0x0'
+                      value:
+                        type: string
+                        example: '0x0'
+                      v:
+                        type: string
+                        example: '0x56'
+                      r:
+                        type: string
+                        example: '0x7dffdcb3d0ffcdef233ac09c7a227235261c116701a39f2aa0f0696e5fbc6a3'
+                      blockHash:
+                        type: string
+                        example: '0x0537eb8f4645f1781a3efa573bd2d2b887a0e67e11ec0732d44024fa5aa6e070'
+                      blockNumber:
+                        type: string
+                        example: '0x10d4f'
+                      hash:
+                        type: string
+                        example: '0x00519e9fde7a66996e69ac4219f1c54636a62afd8c778ab73f601d25e2e336e8'
+                      input:
+                        type: string
+                        example: '0x18cbafe500000000000000000000000000000000000000000000024806f287752cbdc6f1000000000000000000000000000000000000000000000c1f9e13d3bdb43dc8ee00000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000c1a3a5c69e2a76f80805f89a62f107f7a3f9c23a00000000000000000000000000000000000000000000000000000000618e54c50000000000000000000000000000000000000000000000000000000000000002000000000000000000000000adbd1231fb360047525bedf962581f3eee7b49fe0000000000000000000000005c7f8a570d578ed84e63fdfa7b1ee72deae1ae23'
+                      chainId:
+                        type: string
+                        example: '0x19'
+                      gas:
+                        type: string
+                        example: '0x2faab'
+                      type:
+                        type: string
+                        example: '0x0'
+                      from:
+                        type: string
+                        example: '0xc1a3a5c69e2a76f80805f89a62f107f7a3f9c23a'
+                      gasPrice:
+                        type: string
+                        example: '0x65dd0837000'
+                      to:
+                        type: string
+                        example: '0xcd7d16fb918511bf7269ec4f48d61d79fb26f918'
+                      s:
+                        type: string
+                        example: '0x103d5465f2cffe93debef82d864ed372f4bd5335cebc2f8c6d9d2bb8b1d05213'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionCount:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionCount
+      description: Returns the number of transactions sent from an address
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionCount&address={address}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getTransactionCount]
+        - name: address
+          in: query
+          description: Address to get transaction count for
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Block number in hex or tag
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0xf4'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_sendRawTransaction:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_sendRawTransaction
+      description: Sends a raw transaction to the network
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_sendRawTransaction&hex={hex}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_sendRawTransaction]
+        - name: hex
+          in: query
+          description: Signed transaction data in hex format
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+                
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionReceipt:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionReceipt
+      description: Returns the receipt of a transaction by transaction hash
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getTransactionReceipt&txhash={txhash}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getTransactionReceipt]
+        - name: txhash
+          in: query
+          description: Transaction hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: '0x0'
+                      blockHash:
+                        type: string
+                        example: '0x21972f1cfc00f77c6bba87512ae179252a39465931633f5c4b0b35c4ffa34aa3'
+                      contractAddress:
+                        type: string
+                        nullable: true
+                        example: null
+                      cumulativeGasUsed:
+                        type: string
+                        example: '0x1e57fb'
+                      logsBloom:
+                        type: string
+                        example: '0x00000000020000000000000000000000000000000000000010000000000000000000000000000000000000000000000000400000000000080000000000200000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000010000000000000000000000000000000000000000000000020000000000000000102000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000'
+                      to:
+                        type: string
+                        example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                      transactionHash:
+                        type: string
+                        example: '0x2c30c044e9084c3ef49308bb89379a2570ea3ec2e7396794aacd9185bee2547a'
+                      transactionIndex:
+                        type: string
+                        example: '0xe'
+                      blockNumber:
+                        type: string
+                        example: '0x55a9'
+                      from:
+                        type: string
+                        example: '0x718d61377524348eb05293c78fbd8a62b14924b0'
+                      gasUsed:
+                        type: string
+                        example: '0xad42'
+                      logs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            topics:
+                              type: array
+                              items:
+                                type: string
+                              example: [
+                                '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
+                                '0x000000000000000000000000718d61377524348eb05293c78fbd8a62b14924b0',
+                                '0x000000000000000000000000dccd6455ae04b03d785f12196b492b18129564bc'
+                              ]
+                            data:
+                              type: string
+                              example: '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+                            blockNumber:
+                              type: string
+                              example: '0x55a9'
+                            logIndex:
+                              type: string
+                              example: '0x2d'
+                            address:
+                              type: string
+                              example: '0xbf62c67ea509e86f07c8c69d0286c0636c50270b'
+                            transactionHash:
+                              type: string
+                              example: '0x2c30c044e9084c3ef49308bb89379a2570ea3ec2e7396794aacd9185bee2547a'
+                            transactionIndex:
+                              type: string
+                              example: '0xe'
+                            blockHash:
+                              type: string
+                              example: '0x21972f1cfc00f77c6bba87512ae179252a39465931633f5c4b0b35c4ffa34aa3'
+                            removed:
+                              type: boolean
+                              example: false
+                      status:
+                        type: string
+                        example: '0x1'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_call:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_call
+      description: Executes a new message call immediately without creating a transaction on the block chain
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_call&to={to}&data={data}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_call]
+        - name: to
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: data
+          in: query
+          description: Hash of the method signature and encoded parameters
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Block number in hex or tag
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0x0000000000000000000000000000000000000000000000000000000000000001'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getCode:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getCode
+      description: Returns code at a given address
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getCode&address={address}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getCode]
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Block number in hex or tag
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0x608060405234801561001057600080fd5b50600436106101a95760003560e01c80636a627842116100f9578063ba9a7a5611610097578063d21220a711610071578063d21220a714610534578063d505accf1461053c578063dd62ed3e1461058d578063fff6cae9146105bb576101a9565b8063ba9a7a56146104fe578063bc25cf7714610506578063c45a01551461052c576101a9565b80637ecebe00116100d35780637ecebe001461046557806389afcb441461048b57806395d89b41146104ca578063a9059cbb146104d2576101a9565b80636a6278421461041157806370a08231146104375780637464fc3d1461045d576101a9565b806323b872dd116101665780633644e515116101405780633644e515146103cb578063485cc955146103d35780635909c0d5146104015780635a3d549314610409576101a9565b806323b872dd1461036f57806330adf81f146103a5578063313ce567146103ad576101a9565b8063022c0d9f146101ae57806306fdde031461023c5780630902f1ac146102b9578063095ea7b3146102f15780630dfe16811461033157806318160ddd14610355575b600080fd5b61023a600480360360808110156101c457600080fd5b8135916020810135916001600160a01b0360408301351691908101906080810160608201356401000000008111156101fb57600080fd5b82018360208201111561020d57600080fd5b8035906020019184600183028401116401000000008311171561022f57600080fd5b5090925090506105c3565b005b610244610b2e565b6040805160208082528351818301528351919283929083019185019080838360005b8381101561027e578181015183820152602001610266565b50505050905090810190601f1680156102ab5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6102c1610b59565b604080516001600160701b03948516815292909316602083015263ffffffff168183015290519081900360600190f35b61031d6004803603604081101561030757600080fd5b506001600160a01b038135169060200135610b83565b604080519115158252519081900360200190f35b610339610b9a565b604080516001600160a01b039092168252519081900360200190f35b61035d610ba9565b60408051918252519081900360200190f35b61031d6004803603606081101561038557600080fd5b506001600160a01b03813581169160208101359091169060400135610baf565b61035d610c49565b6103b5610c6d565b6040805160ff9092168252519081900360200190f35b61035d610c72565b61023a600480360360408110156103e957600080fd5b506001600160a01b0381358116916020013516610c78565b61035d610cf6565b61035d610cfc565b61035d6004803603602081101561042757600080fd5b50356001600160a01b0316610d02565b61035d6004803603602081101561044d57600080fd5b50356001600160a01b0316610ffc565b61035d61100e565b61035d6004803603602081101561047b57600080fd5b50356001600160a01b0316611014565b6104b1600480360360208110156104a157600080fd5b50356001600160a01b0316611026565b6040805192835260208301919091528051918290030190f35b6102446113c6565b61031d600480360360408110156104e857600080fd5b506001600160a01b0381351690602001356113e8565b61035d6113f5565b61023a6004803603602081101561051c57600080fd5b50356001600160a01b03166113fb565b610339611560565b61033961156f565b61023a600480360360e081101561055257600080fd5b506001600160a01b03813581169160208101359091169060408101359060608101359060ff6080820135169060a08101359060c0013561157e565b61035d600480360360408110156105a357600080fd5b506001600160a01b038135811691602001351661175d565b61023a61177a565b600c54600114610608576040805162461bcd60e51b815260206004820152600b60248201526a159594ce881313d0d2d15160aa1b604482015290519081900360640190fd5b6000600c558415158061061b5750600084115b61066c576040805162461bcd60e51b815260206004820152601f60248201527f5656533a20494e53554646494349454e545f4f55545055545f414d4f554e5400604482015290519081900360640190fd5b600080610677610b59565b5091509150816001600160701b03168710801561069c5750806001600160701b031686105b6106ed576040805162461bcd60e51b815260206004820152601b60248201527f5656533a20494e53554646494349454e545f4c49515549444954590000000000604482015290519081900360640190fd5b60065460075460009182916001600160a01b0391821691908116908916821480159061072b5750806001600160a01b0316896001600160a01b031614155b61076e576040805162461bcd60e51b815260206004820152600f60248201526e5656533a20494e56414c49445f544f60881b604482015290519081900360640190fd5b8a1561077f5761077f828a8d6118d6565b891561079057610790818a8c6118d6565b861561084b57886001600160a01b03166338d7b3cb338d8d8c8c6040518663ffffffff1660e01b815260040180866001600160a01b03166001600160a01b03168152602001858152602001848152602001806020018281038252848482818152602001925080828437600081840152601f19601f8201169050808301925050509650505050505050600060405180830381600087803b15801561083257600080fd5b505af1158015610846573d6000803e3d6000fd5b505050505b604080516370a0823160e01b815230600482015290516001600160a01b038416916370a08231916024808301926020929190829003018186803b15801561089157600080fd5b505afa1580156108a5573d6000803e3d6000fd5b505050506040513d60208110156108bb57600080fd5b5051604080516370a0823160e01b815230600482015290519195506001600160a01b038316916370a0823191602480820192602092909190829003018186803b15801561090757600080fd5b505afa15801561091b573d6000803e3d6000fd5b505050506040513d602081101561093157600080fd5b5051925060009150506001600160701b0385168a90038311610954576000610963565b89856001600160701b03160383035b9050600089856001600160701b031603831161098057600061098f565b89856001600160701b03160383035b905060008211806109a05750600081115b6109f1576040805162461bcd60e51b815260206004820152601e60248201527f5656533a20494e53554646494349454e545f494e5055545f414d4f554e540000604482015290519081900360640190fd5b6000610a25610a0784600363ffffffff611a6716565b610a19876103e863ffffffff611a6716565b9063ffffffff611aca16565b90506000610a3d610a0784600363ffffffff611a6716565b9050610a6e620f4240610a626001600160701b038b8116908b1663ffffffff611a6716565b9063ffffffff611a6716565b610a7e838363ffffffff611a6716565b1015610aba576040805162461bcd60e51b81526020600482015260066024820152655656533a204b60d01b604482015290519081900360640190fd5b5050610ac884848888611b1a565b60408051838152602081018390528082018d9052606081018c905290516001600160a01b038b169133917fd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d8229181900360800190a350506001600c55505050505050505050565b6040518060400160405280600f81526020016e5656532046696e616e6365204c507360881b81525081565b6008546001600160701b0380821692600160701b830490911691600160e01b900463ffffffff1690565b6000610b90338484611cd9565b5060015b92915050565b6006546001600160a01b031681565b60005481565b6001600160a01b038316600090815260026020908152604080832033845290915281205460001914610c34576001600160a01b0384166000908152600260209081526040808320338452909152902054610c0f908363ffffffff611aca16565b6001600160a01b03851660009081526002602090815260408083203384529091529020555b610c3f848484611d3b565b5060019392505050565b7f6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c981565b601281565b60035481565b6005546001600160a01b03163314610cc8576040805162461bcd60e51b815260206004820152600e60248201526d2b2b299d102327a92124a22222a760911b604482015290519081900360640190fd5b600680546001600160a01b039384166001600160a01b03199182161790915560078054929093169116179055565b60095481565b600a5481565b6000600c54600114610d49576040805162461bcd60e51b815260206004820152600b60248201526a159594ce881313d0d2d15160aa1b604482015290519081900360640190fd5b6000600c81905580610d59610b59565b50600654604080516370a0823160e01b815230600482015290519395509193506000926001600160a01b03909116916370a08231916024808301926020929190829003018186803b158015610dad57600080fd5b505afa158015610dc1573d6000803e3d6000fd5b505050506040513d6020811015610dd757600080fd5b5051600754604080516370a0823160e01b815230600482015290519293506000926001600160a01b03909216916370a0823191602480820192602092909190829003018186803b158015610e2a57600080fd5b505afa158015610e3e573d6000803e3d6000fd5b505050506040513d6020811015610e5457600080fd5b505190506000610e73836001600160701b03871663ffffffff611aca16565b90506000610e90836001600160701b03871663ffffffff611aca16565b90506000610e9e8787611df5565b60005490915080610edb57610ec76103e8610a19610ec2878763ffffffff611a6716565b611f53565b9850610ed660006103e8611fa5565b610f2a565b610f276001600160701b038916610ef8868463ffffffff611a6716565b81610eff57fe5b046001600160701b038916610f1a868563ffffffff611a6716565b81610f2157fe5b0461203b565b98505b60008911610f695760405162461bcd60e51b81526004018080602001828103825260228152602001806122666022913960400191505060405180910390fd5b610f738a8a611fa5565b610f7f86868a8a611b1a565b8115610faf57600854610fab906001600160701b0380821691600160701b90041663ffffffff611a6716565b600b555b6040805185815260208101859052815133927f4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f928290030190a250506001600c5550949695505050505050565b60016020526000908152604090205481565b600b5481565b60046020526000908152604090205481565b600080600c5460011461106e576040805162461bcd60e51b815260206004820152600b60248201526a159594ce881313d0d2d15160aa1b604482015290519081900360640190fd5b6000600c8190558061107e610b59565b50600654600754604080516370a0823160e01b815230600482015290519496509294506001600160a01b039182169391169160009184916370a08231916024808301926020929190829003018186803b1580156110da57600080fd5b505afa1580156110ee573d6000803e3d6000fd5b505050506040513d602081101561110457600080fd5b5051604080516370a0823160e01b815230600482015290519192506000916001600160a01b038516916370a08231916024808301926020929190829003018186803b15801561115257600080fd5b505afa158015611166573d6000803e3d6000fd5b505050506040513d602081101561117c57600080fd5b50513060009081526001602052604081205491925061119b8888611df5565b600054909150806111b2848763ffffffff611a6716565b816111b957fe5b049a50806111cd848663ffffffff611a6716565b816111d457fe5b04995060008b1180156111e7575060008a115b6112225760405162461bcd60e51b81526004018080602001828103825260228152602001806122886022913960400191505060405180910390fd5b61122c3084612053565b611237878d8d6118d6565b611242868d8c6118d6565b604080516370a0823160e01b815230600482015290516001600160a01b038916916370a08231916024808301926020929190829003018186803b15801561128857600080fd5b505afa15801561129c573d6000803e3d6000fd5b505050506040513d60208110156112b257600080fd5b5051604080516370a0823160e01b815230600482015290519196506001600160a01b038816916370a0823191602480820192602092909190829003018186803b1580156112fe57600080fd5b505afa158015611312573d6000803e3d6000fd5b505050506040513d602081101561132857600080fd5b5051935061133885858b8b611b1a565b811561136857600854611364906001600160701b0380821691600160701b90041663ffffffff611a6716565b600b555b604080518c8152602081018c905281516001600160a01b038f169233927fdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496929081900390910190a35050505050505050506001600c81905550915091565b6040518060400160405280600681526020016505656532d4c560d41b81525081565b6000610b90338484611d3b565b6103e881565b600c54600114611440576040805162461bcd60e51b815260206004820152600b60248201526a159594ce881313d0d2d15160aa1b604482015290519081900360640190fd5b6000600c55600654600754600854604080516370a0823160e01b815230600482015290516001600160a01b0394851694909316926114ef92859287926114ea926001600160701b03169185916370a0823191602480820192602092909190829003018186803b1580156114b257600080fd5b505afa1580156114c6573d6000803e3d6000fd5b505050506040513d60208110156114dc57600080fd5b50519063ffffffff611aca16565b6118d6565b600854604080516370a0823160e01b8152306004820152905161155692849287926114ea92600160701b90046001600160701b0316916001600160a01b038616916370a0823191602480820192602092909190829003018186803b1580156114b257600080fd5b50506001600c5550565b6005546001600160a01b031681565b6007546001600160a01b031681565b428410156115c2576040805162461bcd60e51b815260206004820152600c60248201526b159594ce881156141254915160a21b604482015290519081900360640190fd5b6003546001600160a01b03808916600081815260046020908152604080832080546001810190915581517f6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c98185015280830195909552948c166060850152608084018b905260a084019490945260c08084018a90528451808503909101815260e08401855280519082012061190160f01b6101008501526101028401959095526101228084019590955283518084039095018552610142830184528451940193909320610162820186905261018282018590526001600160f81b031960f888901b166101a283015282516101838184030181526101a39092019092529091906116d290839063ffffffff6120f116565b90506001600160a01b038116158015906116fd5750886001600160a01b0316816001600160a01b0316145b611747576040805162461bcd60e51b81526020600482015260166024820152755656533a20494e56414c49445f5349474e415455524560501b604482015290519081900360640190fd5b611752898989611cd9565b505050505050505050565b600260209081526000928352604080842090915290825290205481565b600c546001146117bf576040805162461bcd60e51b815260206004820152600b60248201526a159594ce881313d0d2d15160aa1b604482015290519081900360640190fd5b6000600c55600654604080516370a0823160e01b815230600482015290516118cf926001600160a01b0316916370a08231916024808301926020929190829003018186803b15801561181057600080fd5b505afa158015611824573d6000803e3d6000fd5b505050506040513d602081101561183a57600080fd5b5051600754604080516370a0823160e01b815230600482015290516001600160a01b03909216916370a0823191602480820192602092909190829003018186803b15801561188757600080fd5b505afa15801561189b573d6000803e3d6000fd5b505050506040513d60208110156118b157600080fd5b50516008546001600160701b0380821691600160701b900416611b1a565b6001600c55565b604080518082018252601981527f7472616e7366657228616464726573732c75696e74323536290000000000000060209182015281516001600160a01b0385811660248301526044808301869052845180840390910181526064909201845291810180516001600160e01b031663a9059cbb60e01b1781529251815160009460609489169392918291908083835b602083106119835780518252601f199092019160209182019101611964565b6001836020036101000a0380198251168184511680821785525050505050509050019150506000604051808303816000865af19150503d80600081146119e5576040519150601f19603f3d011682016040523d82523d6000602084013e6119ea565b606091505b5091509150818015611a18575080511580611a185750808060200190516020811015611a1557600080fd5b50515b611a60576040805162461bcd60e51b8152602060048201526014602482015273159594ce881514905394d1915497d1905253115160621b604482015290519081900360640190fd5b5050505050565b6000811580611a8257505080820282828281611a7f57fe5b04145b610b94576040805162461bcd60e51b815260206004820152601460248201527364732d6d6174682d6d756c2d6f766572666c6f7760601b604482015290519081900360640190fd5b80820382811115610b94576040805162461bcd60e51b815260206004820152601560248201527464732d6d6174682d7375622d756e646572666c6f7760581b604482015290519081900360640190fd5b6001600160701b038411801590611b3857506001600160701b038311155b611b79576040805162461bcd60e51b815260206004820152600d60248201526c5656533a204f564552464c4f5760981b604482015290519081900360640190fd5b60085463ffffffff42811691600160e01b90048116820390811615801590611ba957506001600160701b03841615155b8015611bbd57506001600160701b03831615155b15611c2e578063ffffffff16611beb85611bd6866121df565b6001600160e01b03169063ffffffff6121f116565b600980546001600160e01b03929092169290920201905563ffffffff8116611c1684611bd6876121df565b600a80546001600160e01b0392909216929092020190555b600880546dffffffffffffffffffffffffffff19166001600160701b03888116919091176dffffffffffffffffffffffffffff60701b1916600160701b8883168102919091176001600160e01b0316600160e01b63ffffffff871602179283905560408051848416815291909304909116602082015281517f1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1929181900390910190a1505050505050565b6001600160a01b03808416600081815260026020908152604080832094871680845294825291829020859055815185815291517f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b9259281900390910190a3505050565b6001600160a01b038316600090815260016020526040902054611d64908263ffffffff611aca16565b6001600160a01b038085166000908152600160205260408082209390935590841681522054611d99908263ffffffff61221616565b6001600160a01b0380841660008181526001602090815260409182902094909455805185815290519193928716927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef92918290030190a3505050565b600080600560009054906101000a90046001600160a01b03166001600160a01b031663017e7e586040518163ffffffff1660e01b815260040160206040518083038186803b158015611e4657600080fd5b505afa158015611e5a573d6000803e3d6000fd5b505050506040513d6020811015611e7057600080fd5b5051600b546001600160a01b038216158015945091925090611f3f578015611f3a576000611eb3610ec26001600160701b0388811690881663ffffffff611a6716565b90506000611ec083611f53565b905080821115611f37576000611eee611edf848463ffffffff611aca16565b6000549063ffffffff611a6716565b90506000611f1383611f0786600263ffffffff611a6716565b9063ffffffff61221616565b90506000818381611f2057fe5b0490508015611f3357611f338782611fa5565b5050505b50505b611f4b565b8015611f4b576000600b555b505092915050565b60006003821115611f96575080600160028204015b81811015611f9057809150600281828581611f7f57fe5b040181611f8857fe5b049050611f68565b50611fa0565b8115611fa0575060015b919050565b600054611fb8908263ffffffff61221616565b60009081556001600160a01b038316815260016020526040902054611fe3908263ffffffff61221616565b6001600160a01b03831660008181526001602090815260408083209490945583518581529351929391927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9281900390910190a35050565b600081831061204a578161204c565b825b9392505050565b6001600160a01b03821660009081526001602052604090205461207c908263ffffffff611aca16565b6001600160a01b038316600090815260016020526040812091909155546120a9908263ffffffff611aca16565b60009081556040805183815290516001600160a01b038516917fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef919081900360200190a35050565b6000815160411461210457506000610b94565b60208201516040830151606084015160001a7f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a082111561214a5760009350505050610b94565b8060ff16601b1415801561216257508060ff16601c14155b156121735760009350505050610b94565b6040805160008152602080820180845289905260ff8416828401526060820186905260808201859052915160019260a0808401939192601f1981019281900390910190855afa1580156121ca573d6000803e3d6000fd5b5050604051601f190151979650505050505050565b6001600160701b0316600160701b0290565b60006001600160701b0382166001600160e01b0384168161220e57fe5b049392505050565b80820182811015610b94576040805162461bcd60e51b815260206004820152601460248201527364732d6d6174682d6164642d6f766572666c6f7760601b604482015290519081900360640190fdfe5656533a20494e53554646494349454e545f4c49515549444954595f4d494e5445445656533a20494e53554646494349454e545f4c49515549444954595f4255524e4544a265627a7a72315820902c49c309bd4a714b52f692ab6ba8d147213a3ac14c441fdec1c26c9338d0ea64736f6c63430005100032'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getStorageAt:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getStorageAt
+      description: Returns the value from a storage position at a given address
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_getStorageAt&address={address}&position={position}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_getStorageAt]
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: position
+          in: query
+          description: Storage position
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Block number or tag
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0x577261707065642043524f000000000000000000000000000000000000000016'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_gasPrice:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_gasPrice
+      description: Returns the current price per gas in wei
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_gasPrice&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_gasPrice]
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0x371d8979300'
+
+  https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_estimateGas:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_estimateGas
+      description: Generates and returns an estimate of how much gas is necessary to allow the transaction to complete
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.cronos.org/testnet/api/v2?module=proxy&action=eth_estimateGas&to={to}&value={value}&gasPrice={gasPrice}&gas={gas}&data={data}&apikey={apikey}'
+      parameters:
+        - name: module
+          in: query
+          description: Module name
+          required: true
+          schema:
+            type: string
+            enum: [proxy]
+        - name: action
+          in: query
+          description: Action name
+          required: true
+          schema:
+            type: string
+            enum: [eth_estimateGas]
+        - name: to
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: value
+          in: query
+          description: Value to send
+          required: false
+          schema:
+            type: string
+        - name: gasPrice
+          in: query
+          description: Gas price
+          required: false
+          schema:
+            type: string
+        - name: gas
+          in: query
+          description: Gas limit
+          required: false
+          schema:
+            type: string
+        - name: data
+          in: query
+          description: Hash of the method signature and encoded parameters
+          required: false
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 0
+                  jsonrpc:
+                    type: string
+                    example: '2.0'
+                  result:
+                    type: string
+                    example: '0x5444'
+
+
+components:
+  schemas:
+    ResponseMetadata:
+      type: object
+      properties:
+        queryLimit:
+          type: integer
+          example: 10000
+    ResponsePagination:
+      type: object
+      properties:
+        totalRecord:
+          type: integer
+          example: 10000
+        totalPage:
+          type: integer
+          example: 500
+        currentPage:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        session:
+          type: string
+          example: MToyMDpNV1k0WWpBNE1EQXdNREF3TURBd01EQXdabVpsTW1ZNVpHWmpPR00wWXpobU5HSm1PRGs0TVRreE9EYzRNV014TURrME5HUmlNVFpsTnprM01UWXlOV0UzWXpZeU4yRTJZVFF4TkdFMU1UWXhOekppWkRneVlXRTRNV0kxTkRrNFlUWXhZVEkyWVRVeFlUazVZVFk1T0RJME1XRmhOV0UwTVdFeE9EVTRNVGd4WWpFNE1XRmhOVEU1TWpZNU9USTJOV0V4T0RFNE1XSXlORGxoTVdJeE9ERTVZVGRoTlRJMU9XRXlOakkxWVdJd016QXlNREF3TUdabVptWXdOVFE0TjJKaFpEVXdNREF3TURBd09qUXNNVEF3TURBPQ==
+    ErrorUnauthenticated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'No API key found in request | Invalid authentication credentials'
+    ErrorBadRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          example: '0'
+        message:
+          type: string
+          example: 'NOTOK'
+        result:
+          type: string
+          example: 'error message'

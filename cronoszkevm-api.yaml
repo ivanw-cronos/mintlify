@@ -1,0 +1,3443 @@
+openapi: 3.1.0
+info:
+  title: Cronos zkEVM API
+  description: |
+    Welcome to the Cronos zkEVM API documentation.
+    
+    As a means to provide equitable access to blockchain data, we've developed the Cronos zkEVM Developer APIs to empower developers with direct access to Cronos's ZK EVM blockchain data and services via GET/POST requests.
+    # Creating Account and Getting API Key
+    ## 1. Register an Account
+    Head over to the <a href="https://developers.zkevm.cronos.org/register"><strong>Account Registration</strong></a> page and provide email and password for your account.
+    
+    <img src="https://explorer-api-doc.zkevm.cronos.org/asset/zkevm-api-registration.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 2. Verify Your Email
+    A verification code will be sent to your email address to verify your sign up request. Fill in on the verification page for completing your registration
+    
+    <img src="https://explorer-api-doc.zkevm.cronos.org/asset/zkevm-api-verification.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 3. Exploring Your Account
+    Upon signing in, you will have access to your account dashboard where you can make full use of Cronos zkEVM Developer Portal's features such as getting your API keys and viewing submitted contract verification status.
+
+    <img src="https://explorer-api-doc.zkevm.cronos.org/asset/zkevm-api-member-dashboard.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 4. Getting an Default API Key
+    From your Account Dashboard, click on label <strong>API Keys</strong>.
+    From there, you may view your API Keys. By Default, each Cronos zkEVM Developer Portal account will assign a default API Key on registration completed.
+
+    <img src="https://explorer-api-doc.zkevm.cronos.org/asset/zkevm-mainnet-api-key-list.png" style="
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;"/>
+    
+    ## 5. Using APIs
+    Once got your API Key, you could fetch data from provided endpoints.
+    
+    Example:
+    ```
+      curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/{module}/{action}?apikey={your_apikey}
+    ```
+  version: 1.0.0
+
+tags:
+  - name: Accounts
+    description: Account module
+  - name: Blocks
+    description: Block module
+  - name: Contracts
+    description: Contract module
+  - name: Eth Proxy
+    description: Eth Proxy module
+  - name: Logs
+    description: Event Log module
+  - name: Tokens
+    description: Token module
+  - name: Transactions
+    description: Transaction module
+
+paths:
+  # Accounts path
+  https://explorer-api.zkevm.cronos.org/api/v1/account/getBalance:
+    get:
+      tags:
+        - Accounts
+      summary: Get Native Token Balance by Address
+      description: Returns the native token balance of a given address
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/account/getBalance?address={address}&apikey={apikey}
+      parameters:
+        - name: address
+          in: query
+          description: Cronos zkEVM address
+          required: true
+          schema:
+            type: string
+        - name: blockHeight
+          in: query
+          description: The block height in number or the string latest, earliest (block 0), pending.
+          required: false
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      balance:
+                        type: string
+                        example: 10
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/account/getTxsByAddress:
+    get:
+      tags:
+        - Accounts
+      summary: Get Transactions by Address
+      description: Returns the list of transactions performed by an address and block range, with optional pagination.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/account/getTxsByAddress?address={address}&startBlock={startBlock}&endBlock={endBlock}&session={session}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Cronos zkEVM address
+          required: true
+          schema:
+            type: string
+        - name: startBlock
+          in: query
+          description: Start block range, the difference with endBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: endBlock
+          in: query
+          description: End block range, the difference with startBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  metadata:
+                    $ref: "#/components/schemas/ResponseMetadata"
+                  pagination:
+                    $ref: "#/components/schemas/ResponsePagination"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: integer
+                          example: 16094014
+                        transactionHash:
+                          type: string
+                          example: '0x98efa9be6d9485c0dd9c24eb17b92935d61f2925511231637fd71b69dbebd38d'
+                        status:
+                          type: integer
+                          example: 1
+                        error:
+                          type: string
+                          example: ''
+                        from:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0x5e1be25d4a2de0083012f1b5a8030a7023ffa5bc'
+                            isContract:
+                              type: boolean
+                        to:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0x114dd7a351d44d792ff422e5ebed8515698b0810'
+                            isContract:
+                              type: boolean
+                        gas:
+                          type: string
+                          example: '526118'
+                        gasPrice:
+                          type: string
+                          example: '1758379992904'
+                        gasLimit:
+                          type: string
+                          example: '533265'
+                        timestamp:
+                          type: integer
+                          example: 1702126099
+                        methodId:
+                          type: string
+                          example: '0x4b1bcc4e'
+                        methodName:
+                          type: string
+                          example: ''
+                        index:
+                          type: integer
+                          example: 0
+                        value:
+                          type: string
+                          example: '0'
+                        type:
+                          type: string
+                          example: '2'
+                        nonce:
+                          type: integer
+                          example: 305642
+                        input:
+                          type: string
+                          example: '0x4b1bcc4e00000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000034000000000000000000000000000000000000000000000000000000000000004200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+                        contractAddress:
+                          type: string
+                          example: ''
+                        confirmations:
+                          type: integer
+                          example: 22
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/account/getInternalTxsByAddress:
+    get:
+      tags:
+        - Accounts
+      summary: Get Internal Transactions by Address
+      description: Returns the list of internal transactions performed by an address and block range, with optional pagination.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/account/getInternalTxsByAddress?address={address}&startBlock={startBlock}&endBlock={endBlock}&session={session}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Cronos zkEVM address
+          required: true
+          schema:
+            type: string
+        - name: startBlock
+          in: query
+          description: Start block range, the difference with endBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: endBlock
+          in: query
+          description: End block range, the difference with startBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  metadata:
+                    $ref: '#/components/schemas/ResponseMetadata'
+                  pagination:
+                    $ref: '#/components/schemas/ResponsePagination'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: integer
+                          example: 16120450
+                        transactionHash:
+                          type: string
+                          example: '0x68d9423a7d9f4c122f267331a4b4336c2d25edeb0dfd82709d363b672aefa137'
+                        timestamp:
+                          type: integer
+                          example: 1702190747
+                        from:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0xcd5cb3a4aed7ae16719f9a78f7a5f88803ee4c89'
+                            isContract:
+                              type: boolean
+                        to:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0x461a7e9bbfe8e8ead2c866f7f311580bf15e28ea'
+                            isContract:
+                              type: boolean
+                        value:
+                          type: string
+                          example: '0'
+                        type:
+                          type: string
+                          example: 'STATICCALL'
+                        gasLimit:
+                          type: integer
+                          example: 95267
+                        traceId:
+                          type: string
+                          example: '1'
+                        isError:
+                          type: string
+                          example: '0'
+                        callError:
+                          type: string
+                          example: ''
+                        input:
+                          type: string
+                          example: '0x0bdeecbd'
+                        contractAddress:
+                          type: string
+                          example: '0xd355d3fd626d9c5d1e1fc8677939387d5392a56a'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/account/getERC20TransferByAddress:
+    get:
+      tags:
+        - Accounts
+      summary: Get ERC-20 Token Transfer Events by Address
+      description: Returns the list of ERC-20 tokens transferred by an address and block range, with optional filtering by token contract.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/account/getERC20TransferByAddress?address={address}&startBlock={startBlock}&endBlock={endBlock}&session={session}&apikey={apikey}'
+      produces:
+        - application/json
+      parameters:
+        - name: address
+          in: query
+          description: Cronos zkEVM address
+          required: true
+          schema:
+            type: string
+        - name: startBlock
+          in: query
+          description: Start block range, the difference with endBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: endBlock
+          in: query
+          description: End block range, the difference with startBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  metadata:
+                    $ref: '#/components/schemas/ResponseMetadata'
+                  pagination:
+                    $ref: '#/components/schemas/ResponsePagination'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: integer
+                          example: 16110976
+                        timestamp:
+                          type: integer
+                          example: 1702167579
+                        transactionHash:
+                          type: string
+                          example: '0x0acf059852870b0f8933ec93ec6f54a4b1b799d8ab00e3dfb28d2bdc757ee454'
+                        eventId:
+                          type: string
+                          example: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+                        eventName:
+                          type: string
+                          example: Transfer
+                        methodId:
+                          type: string
+                          example: '0xd0e85800'
+                        methodName:
+                          type: string
+                          example: ''
+                        from:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0x297a92dad77acaf2b173aae8fd1db7c55a303352'
+                            isContract:
+                              type: boolean
+                        to:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0x52c2966b255a5411e656c248ed19a24a4f84e7c2'
+                            isContract:
+                              type: boolean
+                        value:
+                          type: string
+                          example: '5000000000000000000000'
+                        tokenMetadata:
+                          type: object
+                          properties:
+                            tokenAddress:
+                              type: string
+                              example: '0x3953788e23494cc13c7066e79689e7b21d6fba6c'
+                            tokenName:
+                              type: string
+                              example: 'Papparico Finance Three'
+                            tokenSymbol:
+                              type: string
+                              example: 'PPFTH'
+                            type:
+                              type: integer
+                              example: 20
+                            decimals:
+                              type: integer
+                              example: 18
+                            iconUrl:
+                              type: string
+                              example: ''
+                        confirmations:
+                          type: integer
+                          example: 9764
+                        blockHash:
+                          type: string
+                          example: '0x073d7594678258f224eecabecf13710a3ebaff0f53806f9926e91c5bcd2807d4'
+                        transactionIndex:
+                          type: integer
+                          example: 0
+                        nonce:
+                          type: integer
+                          example: 54
+                        gasPrice:
+                          type: string
+                          example: '1742212940659'
+                        gasLimit:
+                          type: integer
+                          example: 128096
+                        gasUsed:
+                          type: integer
+                          example: 114272
+                        input:
+                          type: string
+                          example: '0xd709815400000000000000000000000000000000000000000000000000000000658f389b'
+                        cumulativeGasUsed:
+                          type: integer
+                          example: 114272
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  # Blocks path
+  https://explorer-api.zkevm.cronos.org/api/v1/block/getBlock:
+    get:
+      tags:
+        - Blocks
+      summary: Get Block Detail by Height
+      description: Returns the block detail for a certain block height.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/block/getBlock?blockHeight={blockHeight}&apikey={apikey}'
+      parameters:
+        - name: blockHeight
+          in: query
+          description: Block height
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      blockNumber:
+                        type: integer
+                        example: 16110976
+                      timestamp:
+                        type: integer
+                        example: 1702167579
+                      blockHash:
+                        type: string
+                        example: '0x511bff8a3f07e6c7e35c70cbff5dc811b517d68ce3a73a4424c2c4f48c683dc0'
+                      parentHash:
+                        type: string
+                        example: '0x30f1ef5277f4af7cb27fff02f1a79aff0631800ff33374a584246f2ed43f94c2'
+                      transactionHashes:
+                        type: array
+                        items:
+                          type: string
+                        example: '0x0acf059852870b0f8933ec93ec6f54a4b1b799d8ab00e3dfb28d2bdc757ee454'
+                      gasUsed:
+                        type: string
+                        example: '166185'
+                      gasLimit:
+                        type: string
+                        example: '60000000'
+                      difficulty:
+                        type: integer
+                        example: 0
+                      size:
+                        type: integer
+                        example: 1839
+                      sha3Uncles:
+                        type: string
+                        example: '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'
+                      nonce:
+                        type: integer
+                        example: 0
+                      baseFeePerGas:
+                        type: string
+                        example: '1755082833164'
+                      internalTxCount:
+                        type: integer
+                        example: 3
+                      blockReward:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                              example: 'basecro'
+                            amount:
+                              type: string
+                              example: '291668460930352753.833326156278588980'
+                      totalDifficulty:
+                        type: integer
+                        example: 0
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/block/getBlockByTime:
+    get:
+      tags:
+        - Blocks
+      summary: Get Block Height by Time
+      description: Returns the block number that was at a certain timestamp.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/block/getBlockByTime?timestamp={timestamp}&apikey={apikey}'
+      parameters:
+        - name: timestamp
+          in: query
+          description: Timestamp
+          required: true
+          schema:
+            type: integer
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      blockHeight:
+                        type: integer
+                        example: 16070121
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  #Contracts Path
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/getAbi:
+    get:
+      tags:
+        - Contracts
+      summary: Get Contract ABI
+      description: Returns the contract Application Binary Interface ( ABI ) of a verified smart contract.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/getAbi?address={address}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      abi:
+                        type: string
+                        example: >-
+                          [{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"symbol\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"initialSupply\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"subtractedValue\",\"type\":\"uint256\"}],\"name\":\"decreaseAllowance\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"addedValue\",\"type\":\"uint256\"}],\"name\":\"increaseAllowance\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/getSourceCode:
+    get:
+      tags:
+        - Contracts
+      summary: Get Contract Source Code
+      description: Returns the Solidity source code of a verified smart contract.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/getSourceCode?address={address}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      sourceCode:
+                        type: string
+                        example: >-
+                          {\"sources\":{\"TestingContractVerification.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\ncontract TestingContractVerification {\\n    uint256 dummy123 = 123;\\n    uint256 public dummyInput; // use 1 as input for constructor\\n    address private owner;\\n\\n    constructor(uint256 _dummyInput) {\\n        owner = msg.sender;\\n        dummyInput = _dummyInput;\\n    }\\n\\n    modifier onlyOwner() {\\n        require(msg.sender == owner, \\\"only owner can call this function\\\");\\n        _;\\n    }\\n\\n    function selfDestruct() public onlyOwner {\\n        selfdestruct(payable(owner));\\n    }\\n}\\n\"}}}
+                      abi:
+                        type: string
+                        example: >-
+                          [{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_dummyInput\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"dummyInput\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"selfDestruct\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]
+                      contractName:
+                        type: string
+                        example: CronosToken
+                      compilerVersion:
+                        type: string
+                        example: 0.8.19
+                      optimizationUsed:
+                        type: string
+                        example: '0'
+                      runs:
+                        type: string
+                        example: '200'
+                      constructorArguments:
+                        type: string
+                        example: >-
+                          0000000000000000000000000000000000000000000000000000000000000001
+                      evmVersion:
+                        type: string
+                        example: 'paris'
+                      library:
+                        type: string
+                        example: ''
+                      licenseType:
+                        type: string
+                        example: 'MIT'
+                      proxy:
+                        type: string
+                        example: '0'
+                      implementation:
+                        type: string
+                        example: ''
+                      swarmSource:
+                        type: string
+                        example: ''
+                      reason:
+                        type: string
+                        example: ''
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/checkVerifyStatus:
+    get:
+      tags:
+        - Contracts
+      summary: Get Verification Status
+      description: Returns the contract verification status.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/checkVerifyStatus?id={id}&apikey={apikey}'
+      parameters:
+        - name: id
+          in: query
+          description: id of verification
+          required: true
+          schema:
+            type: uuid
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: string
+                    example: 'Pass - Verified'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verifySourceCode:
+    post:
+      tags:
+        - Contracts
+      summary: Submit Contract Verification
+      description: Submits a contract source code for verification.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --location --request POST 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verifySourceCode?apikey={apikey}' \
+            --form 'contractAddress="{contractAddress}"' \
+            --form 'name="{name}"' \
+            --form 'compilerVersion="{compilerVersion}"' \
+            --form 'constructorArguments="{constructorArguments}"' \
+            --form 'contract[]=@"{file_path}"' \
+            --form 'compilerType="solidity-standard-json-input"' \
+            --form 'zkCompilerVersion="{zkCompilerVersion}"'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                contractAddress:
+                  type: string
+                  description: Contract address
+                  required: true
+                name:
+                  type: string
+                  description: Name of Contract
+                  required: true
+                compilerVersion:
+                  type: string
+                  description: Compiler version for contract e.g. 0.8.23
+                  required: true
+                constructorArguments:
+                  type: string
+                  description: Constructor arguments of contract
+                  required: false
+                compilerType:
+                  type: string
+                  description: Compiler type of contract
+                  required: true
+                  enum:
+                    - solidity-standard-json-input
+                contract[]:
+                  type: file
+                  description: >-
+                    Json file is located in `/artifacts/build-info/xxxxxxx.json` following the format:
+                    https://docs.soliditylang.org/en/latest/using-the-compiler.html#input-description
+                  required: true
+                  enum:
+                    - .json
+                zkCompilerVersion:
+                  type: string
+                  description: Zksync compiler version for contract
+                  required: true
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      compilerVersion:
+                        type: string
+                        example: '0.8.19'
+                      optimizerRuns:
+                        type: integer
+                        example: '200'
+                      status:
+                        type: string
+                        example: Pending
+                      reason:
+                        type: string
+                        example: ''
+                      name:
+                        type: string
+                        example: A
+                      contractCreationTx:
+                        type: string
+                        example: ''
+                      optimizerEnabled:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        example: '2023-12-07T06:53:39.250955Z'
+                      contractAddress:
+                        type: string
+                        example: '0xA044CbE1B1fBd9a4771dBc87DA8cBc7Dc8eE3587'
+                      license:
+                        type: string
+                        example: 'MIT'
+                      bytecode:
+                        type: string
+                        example: ''
+                      implementation:
+                        type: string
+                        example: ''
+                      swarmSource:
+                        type: string
+                        example: ''
+                      zkSolcVersion:
+                        type: string
+                        example: 'v1.3.19'
+                      zksyncContractVerificationId:
+                        type: string
+                        example: '123'
+                      proxy:
+                        type: boolean
+                      updatedAt:
+                        type: string
+                        example: '2023-12-07T06:53:39.250955Z'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+
+  # Hardhat contract path
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/solc_versions:
+    get:
+      tags:
+        - Contracts
+      summary: "[Hardhat] Get Solc Versions"
+      description: Returns the list of solc versions.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/solc_versions?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  '[
+                       "0.8.6",
+                       "0.8.7",
+                       "0.8.8",
+                       "0.8.9"
+                   ]'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/vyper_versions:
+    get:
+      tags:
+        - Contracts
+      summary: "[Hardhat] Get Vyper Versions"
+      description: Returns the list of Vyper versions.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/vyper_versions?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  '[
+                       "0.3.3",
+                       "0.3.9"
+                   ]'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/zksolc_versions:
+    get:
+      tags:
+        - Contracts
+      summary: "[Hardhat] Get Zksync Solc Versions"
+      description: Returns the list of Zksync solc versions.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/zksolc_versions?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  '[
+                       "v1.3.0",
+                       "v1.3.1",
+                       "v1.3.10",
+                       "v1.3.11"
+                   ]'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/zkvyper_versions:
+    get:
+      tags:
+        - Contracts
+      summary: "[Hardhat] Get Zksync Vyper Versions"
+      description: Returns the list of Zksync Vyper versions.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/zkvyper_versions?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  '[
+                       "v1.3.10",
+                       "v1.3.11",
+                       "v1.3.12",
+                       "v1.3.13",
+                       "v1.3.14",
+                       "v1.3.15",
+                       "v1.3.16",
+                       "v1.3.9"
+                   ]'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/info/{address}:
+    parameters:
+      - name: address
+        in: path
+        required: true
+        description: Contract address.
+        allowEmptyValue: false
+        schema:
+          type: string
+    get:
+      tags:
+        - Contracts
+      summary: "[Hardhat] Get Verification Info"
+      description: Returns the contract verification info.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/info/{address}?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 469
+                      contractAddress:
+                        type: string
+                        example: "0x8238a3f1f4a46882d28bd39b41e29fd5f526e29e"
+                      codeFormat:
+                        type: string
+                        example: "solidity-standard-json-input"
+                      sourceCode:
+                        type: object
+                        properties:
+                          language:
+                            type: string
+                            example: "Solidity"
+                          settings:
+                            type: object
+                            properties:
+                              libraries:
+                                type: null
+                                example: null
+                              evmVersion:
+                                type: string
+                                example: "paris"
+                              optimizer:
+                                type: object
+                                properties:
+                                  enabled:
+                                    type: boolean
+                                    example: true
+                                  runs:
+                                    type: null
+                                    example: null
+                                  mode:
+                                    type: string
+                                    example: "3"
+                              viaIR:
+                                type: null
+                                example: null
+                          sources:
+                            type: object
+                            properties:
+                              "@openzeppelin/contracts/interfaces/draft-IERC1822.sol":
+                                type: object
+                                properties:
+                                  content:
+                                    type: string
+                                    example: |-
+                                      // SPDX-License-Identifier: MIT
+                                      // OpenZeppelin Contracts (last updated v4.5.0) (interfaces/draft-IERC1822.sol)
+
+                                      pragma solidity ^0.8.0;
+
+                                      /**
+                                       * @dev ERC1822: Universal Upgradeable Proxy Standard (UUPS) documents a method for upgradeability through a simplified
+                                       * proxy whose upgrades are fully controlled by the current implementation.
+                                       */
+                                      interface IERC1822Proxiable {
+                                          /**
+                                           * @dev Returns the storage slot that the proxiable contract assumes is being used to store the implementation
+                                           * address.
+                                           *
+                                           * IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks
+                                           * bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this
+                                           * function revert if invoked through a proxy.
+                                           */
+                                          function proxiableUUID() external view returns (bytes32);
+                                      }
+                                  # Content truncated for brevity
+                      contractName:
+                        type: string
+                        example: "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol:BeaconProxy"
+                      compilerZksolcVersion:
+                        type: string
+                        example: "v1.3.18"
+                      compilerSolcVersion:
+                        type: string
+                        example: "0.8.20"
+                      optimizationUsed:
+                        type: boolean
+                        example: true
+                      optimizerMode:
+                        type: null
+                        example: null
+                      constructorArguments:
+                        type: string
+                        example: "0x"
+                      isSystem:
+                        type: boolean
+                        example: false
+                  artifacts:
+                    type: object
+                    properties:
+                      bytecode:
+                        type: array
+                        example: [ 0, 4, 0, 0, 0, 0, 0, 2 ]
+                      abi:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            inputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  internalType:
+                                    type: string
+                                    example: "address"
+                                  name:
+                                    type: string
+                                    example: "beacon"
+                                  type:
+                                    type: string
+                                    example: "address"
+                            stateMutability:
+                              type: string
+                              example: "payable"
+                            type:
+                              type: string
+                              example: "constructor"
+                  verifiedAt:
+                    type: string
+                    example: "2024-07-11T06:32:59.622105758Z"
+
+
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id of verification.
+        allowEmptyValue: false
+        schema:
+          type: string
+    get:
+      tags:
+        - Contracts
+      summary: "[Hardhat] Get Verification Status"
+      description: Returns the contract verification status.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat/{id}?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: 'possible values: successful, failed, in_progress, queued'
+                    example: 'successful'
+                  error:
+                    type: string
+                    description: 'omit if status is successful'
+                    example: 'omit if status is successful'
+
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat:
+     post:
+       tags:
+         - Contracts
+       summary: "[Hardhat] Submit Contract verification"
+       status: 200
+       description: |
+         Submits a contract source code for verification using Zksync Hardhat.
+
+         **Note: Please install and use @matterlabs/hardhat-zksync-verify version v1.7.1 or later instead of using hardhat-etherscan**
+
+         ## 1. Config the `hardhat.config.js` file
+         For this API version, user needs to specify the API key in `verifyURL`.
+  
+         hardhat.config.js
+         ```
+          const config: HardhatUserConfig = {
+              networks: {
+                  cronosZkEvmMainnet: {
+                      url: "https://mainnet.zkevm.cronos.org",
+                      ethNetwork: "mainnet",
+                      zksync: true,
+                      verifyURL: "https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?apikey={apikey}",
+                  },
+              },
+              zksolc: {
+                 ...
+              },
+              solidity: {
+                 ...
+              },
+          };
+         ```
+         ## 2a. Contract deployment and verification script
+         ```
+         npx hardhat deploy-zksync --script MyERC20Token.ts --network cronosZkEvmMainnet
+         ```
+         Sample smart contract Github project: https://github.com/kentimsit/cronos-zkevm-hardhat-boilerplate
+
+         ## 2b. Contract verification script
+         ```
+         npx hardhat verify --network cronosZkEvmMainnet <contract_address>
+         ```
+  
+         For more detail about Zksync Hardhat, please visit https://code.zksync.io/tutorials/how-to-verify-contracts
+       requestBody:
+         content:
+           application/json:
+             schema:
+               type: object
+               properties:
+                 codeFormat:
+                   type: string
+                   description: "solidity-standard-json-input"
+                   example: "solidity-standard-json-input"
+                   required: true
+                 contractAddress:
+                   type: string
+                   description: Address of Contract
+                   example: "0x5950C403095EDE4Bc82d6c22Bc4342f6619C87A0"
+                   required: true
+                 contractName:
+                   type: string
+                   description: Name of Contract
+                   example: "contracts/bridge/L2StandardERC20.sol:L2StandardERC20"
+                   required: true
+                 optimizationUsed:
+                   type: boolean
+                   description: Optimization toggle
+                   example: true
+                   required: true
+                 compilerZksolcVersion:
+                   type: string
+                   description: "Zksolc compiler version"
+                   example: "v1.3.18"
+                   required: true
+                 compilerSolcVersion:
+                   type: string
+                   description: "Solc compiler version"
+                   example: "0.8.20"
+                   required: true
+                 constructorArguments:
+                   type: string
+                   description: Constructor arguments of contract
+                   example: "0x00000000000000000000000014ec95c7c839c96f0d8c77947a85d359e6ab62d400000000000000000000000073f87441531b4b045a6b6f4891be4adba7ed5e9900000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000084a31ee5b00000000000000000000000003e8b2fe58675126ed30d0d12dea2a9bda72d18ae0000000000000000000000004556d64420c07495f0681cffbc739ee6a36d7222010001211b0c33353cdf7a320f768e3dc40bce1326d639fcac099bba9ecd8e3400000000000000000000000073f87441531b4b045a6b6f4891be4adba7ed5e9900000000000000000000000000000000000000000000000000000000"
+                   required: true
+                 sourceCode:
+                   type: object
+                   properties:
+                    language:
+                      type: string
+                      description: Source Code Language
+                      example: Solidity
+                      required: true
+                    sources:
+                      type: object
+                      properties:
+                          contracts/test.sol:
+                            type: object
+                            properties:
+                              content:
+                                type: string
+                                description: Source Code
+                                example: |
+                                  // SPDX-License-Identifier: MIT
+                                  pragma solidity ^0.8.0;
+                                  contract Test {
+                                      function test() public {
+                                          // test function
+                                      }
+                                  }
+                    settings:
+                      type: object
+                      description: Compiler Settings
+                      properties:
+                        evmVersion:
+                          type: string
+                          example: "paris"
+                        optimizer:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                              example: true
+                            mode:
+                              type: string
+                              example: "3"
+                        outputSelection:
+                          type: object
+                          properties:
+                            "*":
+                              type: object
+                              properties:
+                                "*":
+                                  type: array
+                                  items:
+                                    type: string
+                                  example: ["*"]
+
+       responses:
+         '200':
+           description: successful operation
+           content:
+             application/json:
+               schema:
+                 type: integer
+                 example: 1
+         '401':
+           description: unauthorized
+           content:
+             text/html:
+               schema:
+                 $ref: '#/components/schemas/ErrorUnauthenticated'
+         '400':
+           description: bad request
+           content:
+             application/json:
+               schema:
+                 type: string
+                 example: error message
+
+  # Etherscan Hardhat contract path
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=getabi&address={address}:
+    get:
+      tags:
+        - Contracts
+      summary: "[Etherscan Hardhat] Get contract ABI"
+      description: Returns the contract ABI.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=getabi&address={address}&apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+           description: successful operation
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                    status:
+                      type: string
+                      example: '1'
+                    message:
+                      type: string
+                      example: 'OK'
+                    result:
+                      type: string
+                      example: "[{\"inputs\":[],\"name\":\"retrieve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"internalType\":\"struct TupleParams\",\"name\":\"params\",\"type\":\"tuple\"}],\"internalType\":\"struct NestedTupleParams[]\",\"name\":\"params\",\"type\":\"tuple[]\"}],\"name\":\"setNestedTuple\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"internalType\":\"struct TupleParams\",\"name\":\"params\",\"type\":\"tuple\"}],\"name\":\"setTuple\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"internalType\":\"struct TupleParams[]\",\"name\":\"params\",\"type\":\"tuple[]\"}],\"name\":\"setTupleArray\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"num\",\"type\":\"uint256\"}],\"name\":\"store\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '0'
+                  message:
+                    type: string
+                    example: 'Invalid address format'
+                  result:
+                    type: string
+                    example: 'Error message'
+  
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=getsourcecode&address={address}:
+    get:
+      tags:
+        - Contracts
+      summary: "[Etherscan Hardhat] Get contract source code"
+      description: Returns the contract source code.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=getsourcecode&address={address}&apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+        - name: address
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+           description: successful operation
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                    status:
+                      type: string
+                      example: '1'
+                    message:
+                      type: string
+                      example: 'OK'
+                    result:
+                      type: object
+                      example:   {
+                        "OptimizationUsed": "0",
+                        "LicenseType": "",
+                        "Library": "",
+                        "ABI": "[{\"inputs\":[],\"name\":\"retrieve\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"internalType\":\"struct TupleParams\",\"name\":\"params\",\"type\":\"tuple\"}],\"internalType\":\"struct NestedTupleParams[]\",\"name\":\"params\",\"type\":\"tuple[]\"}],\"name\":\"setNestedTuple\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"internalType\":\"struct TupleParams\",\"name\":\"params\",\"type\":\"tuple\"}],\"name\":\"setTuple\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"vault\",\"type\":\"string\"},{\"internalType\":\"address[]\",\"name\":\"token0\",\"type\":\"address[]\"},{\"internalType\":\"uint256\",\"name\":\"normalizedWeight0\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"oracleEnabled\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"internalType\":\"struct TupleParams[]\",\"name\":\"params\",\"type\":\"tuple[]\"}],\"name\":\"setTupleArray\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"num\",\"type\":\"uint256\"}],\"name\":\"store\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+                        "Proxy": "0",
+                        "ZkSolcVersion": "",
+                        "SimilarMatch": "",
+                        "Implementation": "",
+                        "SwarmSource": "",
+                        "Runs": "",
+                        "EVMVersion": "",
+                        "ContractName": "contracts/test.sol:Storage",
+                        "ConstructorArguments": "",
+                        "CompilerVersion": "0.8.26",
+                        "CompilerType": "solc",
+                        "SourceCode": "{\"codeFormat\":\"solidity-standard-json-input\",\"sourceCode\":{\"language\":\"Solidity\",\"settings\":{\"evmVersion\":\"paris\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"outputSelection\":{\"*\":{\"\":[\"ast\"],\"*\":[\"abi\",\"evm.bytecode\",\"evm.deployedBytecode\",\"evm.methodIdentifiers\",\"metadata\"]}}},\"sources\":{\"contracts/test.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\n\\npragma solidity >=0.8.2 <0.9.0;\\n\\n/**\\n * @title Storage\\n * @dev Store & retrieve value in a variable\\n * @custom:dev-run-script ./scripts/deploy_with_ethers.ts\\n */\\n struct TupleParams {\\n    string vault;\\n    address[] token0;\\n    uint256 normalizedWeight0;\\n    bool oracleEnabled;\\n    address owner;\\n}\\n\\n struct NestedTupleParams {\\n    string vault;\\n    address[] token0;\\n    uint256 normalizedWeight0;\\n    bool oracleEnabled;\\n    TupleParams params;\\n}\\n\\n\\ncontract Storage {\\n\\n    uint256 number;\\n    TupleParams tupleParams;\\n\\n    /**\\n     * @dev Store value in variable\\n     * @param num value to store\\n     */\\n    function store(uint256 num) public {\\n        number = num;\\n    }\\n\\n    function setTuple(TupleParams calldata params) public {\\n        tupleParams =  params;\\n    }\\n\\n    function setTupleArray(TupleParams[] calldata params) public {\\n\\n    }\\n\\n    function setNestedTuple(NestedTupleParams[] calldata params) public {\\n\\n    }\\n\\n    /**\\n     * @dev Return value \\n     * @return value of 'number'\\n     */\\n    function retrieve() public view returns (uint256){\\n        return number;\\n    }\\n}\"}}}}"
+                      }
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '0'
+                  message:
+                    type: string
+                    example: 'Invalid address format'
+                  result:
+                    type: string
+                    example: 'Error message'
+  
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=checkverifystatus&guid={guid}:
+    get:
+      tags:
+        - Contracts
+      summary: "[Etherscan Hardhat] Get contract verification status"
+      description: Returns the contract verification status.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=checkverifystatus&guid={guid}&apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+        - name: guid
+          in: query
+          description: contract verification guid
+          example: "100"
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+           description: successful operation
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                    status:
+                      type: string
+                      example: '1'
+                    message:
+                      type: string
+                      example: 'OK'
+                    result:
+                      type: string
+                      example: "Pass - Verified"
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '0'
+                  message:
+                    type: string
+                    example: 'Invalid address format'
+                  result:
+                    type: string
+                    example: 'Error message'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat?module=contract&action=verifySourceCode:
+     post:
+       tags:
+         - Contracts
+       summary: "[Etherscan Hardhat] Submit EVM Contract verification"
+       status: 200
+       description: |
+         Submits a contract source code for verification using Hardhat.
+  
+         ## 1. Config the `hardhat.config.js` file
+         For this API version, user needs to add the custom chains Cronos Zkevm inside the Etherscan config. And comment out the zksolc config.
+  
+         hardhat.config.js
+         ```
+          const config: HardhatUserConfig = {
+              networks: {
+                  cronosZkEvmMainnet: {
+                      url: "https://mainnet.zkevm.cronos.org",
+                      ethNetwork: "mainnet",
+                      zksync: false,
+                  },
+              },
+               etherscan: {
+                  apiKey: {
+                      cronosZkEvmMainnet: "{apikey}",
+                  },
+                  customChains: [
+                      {
+                          network: "cronosZkEvmMainnet",
+                          chainId: 388,
+                          urls: {
+                              apiURL: "https://explorer-api.zkevm.cronos.org/api/v1/contract/verify/hardhat",
+                              browserURL: "https://explorer.zkevm.cronos.org",
+                          },
+                      },
+                  ],
+              },
+              # zksolc: {
+              #    ...
+              # },
+              solidity: {
+                 ...
+              },
+          };
+         ```
+         ## 2a. Contract deployment and verification script
+         ```
+         npx hardhat deploy-zksync --script MyERC20Token.ts --network cronosZkEvmMainnet
+         ```
+         Sample smart contract Github project: https://github.com/kentimsit/cronos-zkevm-hardhat-boilerplate
+
+         ## 2b. Contract verification script
+         ```
+         npx hardhat verify --network cronosZkEvmMainnet <contract_address>
+         ```
+  
+         For more detail about Zksync Hardhat, please visit https://code.zksync.io/tutorials/how-to-verify-contracts
+       requestBody:
+         content:
+           application/x-www-form-urlencoded:
+             schema:
+               type: object
+               properties:
+                 codeFormat:
+                   type: string
+                   description: "solidity-standard-json-input | solidity-single-file"
+                   example: "solidity-standard-json-input"
+                   required: true
+                 sourceCode:
+                   type: object
+                   properties:
+                    language:
+                      type: string
+                      description: Source Code Language
+                      example: Solidity
+                      required: true
+                    sources:
+                      type: object
+                      properties:
+                          contracts/test.sol:
+                            type: object
+                            properties:
+                              content:
+                                type: string
+                                description: Source Code
+                                example: |
+                                  // SPDX-License-Identifier: MIT
+                                  pragma solidity ^0.8.0;
+                                  contract Test {
+                                      function test() public {
+                                          // test function
+                                      }
+                                  }
+                    settings:
+                      type: object
+                      description: Compiler Settings
+                      properties:
+                        evmVersion:
+                          type: string
+                          example: "paris"
+                        optimizer:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                              example: true
+                            mode:
+                              type: string
+                              example: "3"
+                        outputSelection:
+                          type: object
+                          properties:
+                            "*":
+                              type: object
+                              properties:
+                                "*":
+                                  type: array
+                                  items:
+                                    type: string
+                                  example: ["*"]
+                 constructorArguements:
+                  type: string
+                  description: Constructor arguments of contract
+                  example: "0x00000000000000000000000014ec95c7c839c96f0d8c77947a85d359e6ab62d400000000000000000000000073f87441531b4b045a6b6f4891be4adba7ed5e9900000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000084a31ee5b00000000000000000000000003e8b2fe58675126ed30d0d12dea2a9bda72d18ae0000000000000000000000004556d64420c07495f0681cffbc739ee6a36d7222010001211b0c33353cdf7a320f768e3dc40bce1326d639fcac099bba9ecd8e3400000000000000000000000073f87441531b4b045a6b6f4891be4adba7ed5e9900000000000000000000000000000000000000000000000000000000"
+                  required: true
+                 contractaddress:
+                   type: string
+                   description: Address of Contract
+                   example: "0x5950C403095EDE4Bc82d6c22Bc4342f6619C87A0"
+                   required: true
+                 contractname:
+                   type: string
+                   description: Name of Contract
+                   example: "contracts/bridge/L2StandardERC20.sol:L2StandardERC20"
+                   required: true
+                 compilerversion:
+                   type: string
+                   description: "Solc compiler version"
+                   example: "v0.8.24+commit.e11b9ed9"
+                   required: true
+                 zksolcVersion:
+                   type: string
+                   description: "Zksolc compiler version"
+                   example: "v1.3.18"
+                   required: false
+       responses:
+         '200':
+           description: successful operation
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                    status:
+                      type: string
+                      example: '1'
+                    message:
+                      type: string
+                      example: 'OK'
+                    result:
+                      type: integer
+                      example: 1
+         '401':
+           description: unauthorized
+           content:
+             text/html:
+               schema:
+                 $ref: '#/components/schemas/ErrorUnauthenticated'
+         '400':
+           description: bad request
+           content:
+             application/json:
+               schema:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: '0'
+                    message:
+                      type: string
+                      example: 'Error message'
+                    result:
+                      type: string
+                      example: 'Error details'
+
+  #Eth Proxy Path
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getBlockNumber:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_blockNumber
+      description: Returns the number of most recent block
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getBlockNumber?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_blocknumber
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getBlockByNumber:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getBlockByNumber
+      description: Returns information about a block by block number.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getBlockByNumber?tag={tag}&txDetail={txDetail}&apikey={apikey}'
+      parameters:
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: txDetail
+          in: query
+          description: If true it returns the full transaction objects, if false only the hashes of the transactions.
+          required: true
+          schema:
+            type: bool
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getblockbynumber
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getBlockTxCountByNumber:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getBlockTransactionCountByNumber
+      description: Returns the number of transactions in a block.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getBlockTxCountByNumber?tag={tag}&apikey={apikey}'
+      parameters:
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getblocktransactioncountbynumber
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTransactionByHash:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionByHash
+      description: Returns the information about a transaction requested by transaction hash.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTransactionByHash?txHash={txHash}&apikey={apikey}'
+      parameters:
+        - name: txHash
+          in: query
+          description: Transaction Hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionbyhash
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTxByBlockNumberAndIndex:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionByBlockNumberAndIndex
+      description: Returns information about a transaction by block number and transaction index position.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTxByBlockNumberAndIndex?tag={tag}&index={index}&apikey={apikey}'
+      parameters:
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: index
+          in: query
+          description: Transaction index position in hex
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionbyblocknumberandindex
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTxCount:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionCount
+      description: Returns the number of transactions sent from an address.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTxCount?tag={tag}&address={address}&apikey={apikey}'
+      parameters:
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: address
+          in: query
+          description: Cronos address
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactioncount
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/sendRawTx:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_sendRawTransaction
+      description: Creates new message call transaction or a contract creation for signed transactions.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/sendRawTx?data={data}&apikey={apikey}'
+      parameters:
+        - name: data
+          in: query
+          description: The signed transaction data.
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_sendrawtransaction
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTxReceipt:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getTransactionReceipt
+      description: Returns the receipt of a transaction by transaction hash.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getTxReceipt?txHash={txHash}&apikey={apikey}'
+      parameters:
+        - name: txHash
+          in: query
+          description: Transaction Hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/call:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_call
+      description: Executes a new message call immediately without creating a transaction on the blockchain.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/call?toAddress={toAddress}&data={data}&apikey={apikey}'
+      parameters:
+        - name: toAddress
+          in: query
+          description: Address to interact with
+          required: true
+          schema:
+            type: string
+        - name: data
+          in: query
+          description: Hash of the method signature and encoded parameters
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_call
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getCode:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getCode
+      description: Returns code at a given address.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getCode?address={address}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Cronos address
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getcode
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getStorageAt:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_getStorageAt
+      description: Returns the value from a storage position at a given address.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/getStorageAt?address={address}&position={position}&tag={tag}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Cronos address
+          required: true
+          schema:
+            type: string
+        - name: position
+          in: query
+          description: Integer of the position in the storage in hex
+          required: true
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Integer of a block number in hex, or the string "earliest", "latest" or "pending", as in https://ethereum.org/en/developers/docs/apis/json-rpc/#default-block
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getstorageat
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/gasPrice:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_gasPrice
+      description: Returns the current price per gas in wei.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/gasPrice?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gasprice
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/estimateGas:
+    get:
+      tags:
+        - Eth Proxy
+      summary: eth_estimateGas
+      description: Makes a call or transaction, which won't be added to the blockchain and returns the estimated gas used.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/ethproxy/estimateGas?toAddress={toAddress}&data={data}&value={value}&gas={gas}&gasPrice={gasPrice}&apikey={apikey}'
+      parameters:
+        - name: toAddress
+          in: query
+          description: Address to interact with
+          required: true
+          schema:
+            type: string
+        - name: data
+          in: query
+          description: Hash of the method signature and encoded parameters
+          schema:
+            type: string
+        - name: value
+          in: query
+          description: Value sent in this transaction, in hex eg. 0xff22
+          schema:
+            type: string
+        - name: gas
+          in: query
+          description: Amount of gas provided for the transaction, in hex eg. 0x5f5e0ff
+          schema:
+            type: string
+        - name: gasPrice
+          in: query
+          description: Gas price paid for each unit of gas, in wei
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Follow https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_estimategas
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+
+  #Logs Path
+  https://explorer-api.zkevm.cronos.org/api/v1/log/getLogs:
+    get:
+      tags:
+        - Logs
+      summary: Get Logs
+      description: Returns event Log by address, block range and topic inputs
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/log/getLogs?contractAddress={contractAddress}&startBlock={startBlock}&endBlock={endBlock}&apikey={apikey}'
+      parameters:
+        - name: contractAddress
+          in: query
+          description: Contract address
+          required: true
+          schema:
+            type: string
+        - name: startBlock
+          in: query
+          description: Start block range, the difference with endBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: endBlock
+          in: query
+          description: End block range, the difference with startBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: topic0
+          in: query
+          description: Topic 0 input
+          required: false
+          schema:
+            type: string
+        - name: topic1
+          in: query
+          description: Topic 1 input
+          required: false
+          schema:
+            type: string
+        - name: topic2
+          in: query
+          description: Topic 2 input
+          required: false
+          schema:
+            type: string
+        - name: topic3
+          in: query
+          description: Topic 3 input
+          required: false
+          schema:
+            type: string
+        - name: topic01Opr
+          in: query
+          description: Operator between specified topic 0 and topic 1
+          required: false
+          schema:
+            type: string
+          enum:
+            - and
+            - or
+        - name: topic12Opr
+          in: query
+          description: Operator between specified topic 1 and topic 2
+          required: false
+          schema:
+            type: string
+          enum:
+            - and
+            - or
+        - name: topic23Opr
+          in: query
+          description: Operator between specified topic 2 and topic 3
+          required: false
+          schema:
+            type: string
+          enum:
+            - and
+            - or
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: '1'
+                message:
+                  type: string
+                  example: 'OK'
+                result:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                        example: '0x0cfb3c7c11a33bef124a9d86073e73932b9abf90'
+                      topics:
+                        type: array
+                        items:
+                          type: string
+                        example: '0xe2d69d9df6c1e740c72aecc4a0cd85eca27cbc5273ec079de974008f492a9f8b'
+                      data:
+                        type: string
+                        example: >-
+                          0x00000000000000000000000000000000000000000000000000000000000352050000000000000000000000000000000000000000000000000000000000000003000000000000000000000000d7eca0820253e0eaf3e9c53ba37c64e7e181f8c500000000000000000000000000000000000000000000000000000000000001200000000000000000000000005538e600dc919f72858dd4d4f5e4327ec6f2af600000000000000000000000000000000000000000000000000000000000000180000000000000000000000000000000000000000000000000000000000bebc200000000000000000000000000000000000000000000000000000000000bebc200000000000000000000000000d7eca0820253e0eaf3e9c53ba37c64e7e181f8c5000000000000000000000000000000000000000000000000000000000000002a30786437454341303832303235334530456166334539433533424133376336344537653138316638433500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a30784338393246314430396137424546393864363565376639624434363432643336424335303634343100000000000000000000000000000000000000000000
+                      blockNumber:
+                        type: integer
+                        example: 16122465
+                      blockHash:
+                        type: string
+                        example: '0xbc586d92490f99ff46fa68c6493908d82ba6d501a06c8ebc1ec0ae6ccf53e61b'
+                      gasPrice:
+                        type: string
+                        example: '1755881554699'
+                      gasUsed:
+                        type: integer
+                        example: 160342
+                      logIndex:
+                        type: integer
+                        example: 3
+                      transactionHash:
+                        type: string
+                        example: '0x7e06078595166cb18bda18fd7ae406682b1b3d33934b731672298d3a5aee5838'
+                      transactionIndex:
+                        type: integer
+                        example: 0
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/log/getLogsByBlock:
+    get:
+      tags:
+        - Logs
+      summary: Get Logs by Block Height
+      description: Returns event Log by block height
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/log/getLogsByBlock?blockHeight={blockHeight}&apikey={apikey}'
+      parameters:
+        - name: blockHeight
+          in: query
+          description: Block height
+          required: true
+          schema:
+            type: string
+        - name: transactionHash
+          in: query
+          description: Transaction Hash
+          required: false
+          schema:
+            type: string
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  metadata:
+                    $ref: "#/components/schemas/ResponseMetadata"
+                  pagination:
+                    $ref: "#/components/schemas/ResponsePagination"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: integer
+                          example: 15947186
+                        blockHash:
+                          type: string
+                          example: '0xb464cb304d53d3d1693ae966dc8849128e1e0192565823646cb373b64307377d'
+                        gasUsed:
+                          type: string
+                          example: '245835'
+                        transactionHash:
+                          type: string
+                          example: '0x06dc471afc046fb2aa3c1545a815289603acbefac41f17d703450793664d37ee'
+                        transactionIndex:
+                          type: integer
+                          example: 0
+                        logs:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              address:
+                                type: string
+                                example: '0xbaea4a1a2eaa4e9bb78f2303c213da152933170e'
+                              topics:
+                                type: array
+                                items:
+                                  type: string
+                                example: [
+                                  '0xd06a6b7f4918494b3719217d1802786c1f5112a6c1d88fe2cfec00b4584f6aec'
+                                ]
+                              data:
+                                type: string
+                                example: '0x00000000000000000000000000000000000000000000000000000000656ee6f40000000000000000000000000000000000000000000000000000003342766aa300000000000000000000000000000000000000000000000000000000087da4bb'
+                              logIndex:
+                                type: integer
+                                example: 0
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  #Tokens Path
+  https://explorer-api.zkevm.cronos.org/api/v1/token/getTotalSupplyByContract:
+    get:
+      tags:
+        - Tokens
+      summary: Get ERC-20 Token TotalSupply by ContractAddress
+      description: Returns the total supply of a ERC-20 token.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/token/getTotalSupplyByContract?address={address}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Contract Address
+          required: true
+          schema:
+            type: string
+        - name: blockHeight
+          in: query
+          description: The block height in number or the string latest, earliest (block 0), pending.
+          required: false
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      totalSupply:
+                        type: string
+                        example: '941892595777969765260192614'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/token/getAccountBalanceByContract:
+    get:
+      tags:
+        - Tokens
+      summary: Get ERC-20 Token Account Balance by ContractAddress
+      description: Returns the current balance of a ERC-20 token of an address.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/token/getAccountBalanceByContract?address={address}&contractAddress={contractAddress}&apikey={apikey}'
+      parameters:
+        - name: address
+          in: query
+          description: Cronos Address
+          required: true
+          schema:
+            type: string
+        - name: contractAddress
+          in: query
+          description: Contract Address
+          required: true
+          schema:
+            type: string
+        - name: blockHeight
+          in: query
+          description: The block height in number or the string latest, earliest (block 0), pending.
+          required: false
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      tokenBalance:
+                        type: string
+                        example: '50830454220087027518'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  #Transctions Path
+  https://explorer-api.zkevm.cronos.org/api/v1/transaction/getStatus:
+    get:
+      tags:
+        - Transactions
+      summary: Get Transaction Status by Transaction Hash
+      description: Returns the status code of a transaction execution.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/transaction/getStatus?txHash={txHash}&apikey={apikey}'
+      parameters:
+        - name: txHash
+          in: query
+          description: Transaction Hash
+          required: true
+          schema:
+            type: string
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        example: 0
+                      isError:
+                        type: integer
+                        example: 1
+                      errDescription:
+                        type: string
+                        example: 'execution reverted'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/transaction/getInternalTxsByHash:
+    get:
+      tags:
+        - Transactions
+      summary: Get Internal Transactions by Transaction Hash
+      description: Returns the list of internal transactions performed within a transaction.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/account/getInternalTxsByHash?txHash={txHash}&session={session}&apikey={apikey}'
+      parameters:
+        - name: txHash
+          in: query
+          description: Transaction hash
+          required: true
+          schema:
+            type: string
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  metadata:
+                    $ref: '#/components/schemas/ResponseMetadata'
+                  pagination:
+                    $ref: '#/components/schemas/ResponsePagination'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: integer
+                          example: 16120450
+                        transactionHash:
+                          type: string
+                          example: '0x68d9423a7d9f4c122f267331a4b4336c2d25edeb0dfd82709d363b672aefa137'
+                        timestamp:
+                          type: integer
+                          example: 1702190747
+                        from:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0xcd5cb3a4aed7ae16719f9a78f7a5f88803ee4c89'
+                            isContract:
+                              type: boolean
+                        to:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0xce528fada8befcacc848ae9d0fd06770b11f43db'
+                            isContract:
+                              type: boolean
+                        value:
+                          type: string
+                          example: '0'
+                        type:
+                          type: string
+                          example: 'STATICCALL'
+                        gasLimit:
+                          type: integer
+                          example: 124102
+                        traceId:
+                          type: string
+                          example: '0'
+                        isError:
+                          type: string
+                          example: '0'
+                        callError:
+                          type: string
+                          example: ''
+                        input:
+                          type: string
+                          example: '0x0bdeecbd'
+                        contractAddress:
+                          type: string
+                          example: '0xd355d3fd626d9c5d1e1fc8677939387d5392a56a'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+  https://explorer-api.zkevm.cronos.org/api/v1/transaction/getInternalTxsByBlockRange:
+    get:
+      tags:
+        - Transactions
+      summary: Get Internal Transactions by Block Range
+      description: Returns the list of internal transactions performed within a block range, with optional pagination.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/account/getInternalTxsByBlockRange?startBlock={startBlock}&endBlock={endBlock}&session={session}&apikey={apikey}'
+      parameters:
+        - name: startBlock
+          in: query
+          description: Start block range, the difference with endBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: endBlock
+          in: query
+          description: End block range, the difference with startBlock is limited to 10000
+          required: true
+          schema:
+            type: string
+        - name: session
+          in: query
+          description: Previous page session. Leave it empty for first page
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  metadata:
+                    $ref: '#/components/schemas/ResponseMetadata'
+                  pagination:
+                    $ref: '#/components/schemas/ResponsePagination'
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        blockNumber:
+                          type: integer
+                          example: 16120450
+                        transactionHash:
+                          type: string
+                          example: '0x68d9423a7d9f4c122f267331a4b4336c2d25edeb0dfd82709d363b672aefa137'
+                        timestamp:
+                          type: integer
+                          example: 1702190747
+                        from:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0xcd5cb3a4aed7ae16719f9a78f7a5f88803ee4c89'
+                            isContract:
+                              type: boolean
+                        to:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              example: '0xce528fada8befcacc848ae9d0fd06770b11f43db'
+                            isContract:
+                              type: boolean
+                        value:
+                          type: string
+                          example: '0'
+                        type:
+                          type: string
+                          example: 'STATICCALL'
+                        gasLimit:
+                          type: integer
+                          example: 124102
+                        traceId:
+                          type: string
+                          example: '0'
+                        isError:
+                          type: string
+                          example: '0'
+                        callError:
+                          type: string
+                          example: ''
+                        input:
+                          type: string
+                          example: '0x0bdeecbd'
+                        contractAddress:
+                          type: string
+                          example: '0xd355d3fd626d9c5d1e1fc8677939387d5392a56a'
+        '401':
+          description: unauthorized
+          content:
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthenticated'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+#Price Path
+  https://explorer-api.zkevm.cronos.org/api/v1/price/getZkcroPrice:
+    get:
+      tags:
+        - ZkcroPrice
+      summary: Get Zkcro Price
+      description: Returns the current price of Zkcro.
+      x-codeSamples:
+        - lang: cURL
+          label: 'CLI'
+          source: |
+            curl --request GET 'https://explorer-api.zkevm.cronos.org/api/v1/price/getZkcroPrice?apikey={apikey}'
+      parameters:
+        - name: apikey
+          in: query
+          description: API Key
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: '1'
+                  message:
+                    type: string
+                    example: 'OK'
+                  result:
+                    type: object
+                    properties:
+                      priceInUSD:
+                        type: string
+                        example: '0.0762552476'
+                      priceInBTC:
+                        type: string
+                        example: '0.000001137377535012923'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'No API key found in request'
+                  request_id:
+                    type: string
+                    example: '87d7464a4ae52572a889b804ae02125e'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBadRequest'
+
+components:
+  schemas:
+    ResponseMetadata:
+      type: object
+      properties:
+        queryLimit:
+          type: integer
+          example: 10000
+    ResponsePagination:
+      type: object
+      properties:
+        totalRecord:
+          type: integer
+          example: 10000
+        totalPage:
+          type: integer
+          example: 500
+        currentPage:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        session:
+          type: string
+          example: MToyMDpNV1k0WWpBNE1EQXdNREF3TURBd01EQXdabVpsTW1ZNVpHWmpPR00wWXpobU5HSm1PRGs0TVRreE9EYzRNV014TURrME5HUmlNVFpsTnprM01UWXlOV0UzWXpZeU4yRTJZVFF4TkdFMU1UWXhOekppWkRneVlXRTRNV0kxTkRrNFlUWXhZVEkyWVRVeFlUazVZVFk1T0RJME1XRmhOV0UwTVdFeE9EVTRNVGd4WWpFNE1XRmhOVEU1TWpZNU9USTJOV0V4T0RFNE1XSXlORGxoTVdJeE9ERTVZVGRoTlRJMU9XRXlOakkxWVdJd016QXlNREF3TUdabVptWXdOVFE0TjJKaFpEVXdNREF3TURBd09qUXNNVEF3TURBPQ==
+    ErrorUnauthenticated:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'No API key found in request | Invalid authentication credentials'
+    ErrorBadRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          example: '0'
+        message:
+          type: string
+          example: 'NOTOK'
+        result:
+          type: string
+          example: 'error message'
