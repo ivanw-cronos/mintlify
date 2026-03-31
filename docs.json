@@ -9,8 +9,8 @@
   },
   "favicon": "/favicon.svg",
   "openapi": [
-    "https://explorer-api-doc.cronos.org/testnet/cronos-api-v2.yaml",
-    "https://explorer-api-doc.zkevm.cronos.org/testnet/cronos-api.yaml"
+    "cronos-api-v2-fixed.yaml",
+    "cronoszkevm-api-fixed.yaml"
   ],
   "navigation": {
     "tabs": [
@@ -28,22 +28,15 @@
         ]
       },
       {
-        "tab": "Cronos Testnet API",
-        "openapi": "https://explorer-api-doc.cronos.org/testnet/cronos-api-v2.yaml",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "Cronos Testnet API v2",
-            "openapi": "https://explorer-api-doc.cronos.org/testnet/cronos-api-v2.yaml"
-          }
-        ]
-      },
-      {
-        "tab": "Cronos zkEVM API",
-        "openapi": "https://explorer-api-doc.zkevm.cronos.org/testnet/cronos-api.yaml",
-        "groups": [
+            "group": "Cronos",
+            "openapi": "cronos-api-v2-fixed.yaml"
+          },
           {
-            "group": "Cronos zkEVM API",
-            "openapi": "https://explorer-api-doc.zkevm.cronos.org/testnet/cronos-api.yaml"
+            "group": "zkEVM",
+            "openapi": "cronoszkevm-api-fixed.yaml"
           }
         ]
       }
