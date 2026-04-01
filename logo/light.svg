@@ -1,7 +1,3 @@
-<svg width="140" height="32" viewBox="0 0 140 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Cronos icon -->
-  <path d="M16 2L28 9v14l-12 7L4 23V9l12-7z" stroke="#00AAFF" stroke-width="2.2" fill="none"/>
-  <path d="M16 8L23 12v8l-7 4-7-4v-8l7-4z" fill="#00AAFF"/>
-  <!-- cronos text -->
-  <text x="36" y="21.5" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="18" font-weight="600" fill="#1A1A2E" letter-spacing="0.5">cronos</text>
+<svg width="80" height="32" viewBox="0 0 80 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="4" y="21.5" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="18" font-weight="600" fill="#1A1A2E" letter-spacing="0.5">cronos</text>
 </svg>
